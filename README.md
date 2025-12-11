@@ -1,189 +1,66 @@
-📘 Loom Engine
+Loom Engine
 
 A modular, operator-first framework for building and managing Project Worlds.
 
-The Loom Engine transforms your creative and strategic work into structured Worlds powered by Patterns, Agents, and multi-layer memory.
-It is designed for clarity, continuity, and scalable thinking across months or years of project evolution.
+The Loom Engine transforms creative and strategic work into structured Worlds powered by Patterns, Agents, and multi-layer memory. It is designed for clarity, continuity, and scalable thinking across long arcs of work.
 
-🌐 What Is the Loom Engine?
+What Is the Loom Engine?
 
 The Loom Engine is a cognitive framework that organizes work into:
 
 Worlds — self-contained project spaces with identity, rules, agents, and memory
-
 Patterns — structured workflows that define how reasoning unfolds
-
 Agents — role-bound collaborators with consistent behavior
-
 Memory Layers — short- and long-term continuity (L1–L4)
-
 META Division — structural oversight and drift prevention
-
 Feedback Loop — safe system evolution governed by the Operator
 
 It is built around one principle:
+The Operator is sovereign. The Engine adapts to the Operator’s identity, tone, constraints, and long-term direction.
 
-The Operator is sovereign.
-The Engine adapts to you — your tone, identity, constraints, and long-arc goals.
+Core Features
 
-🔧 Core Features
-🧶 Project Worlds
-
-Treat each project as a self-contained universe:
-
-Purpose
-
-Identity & tone
-
-Rules & constraints
-
-Agents
+Project Worlds
+Each project becomes its own coherent universe with purpose, identity, rules, constraints, agents, memory, and workflow patterns.
 
 Patterns
+Reusable workflow templates for ideation, structuring, insight, drafting, refinement, and production. Patterns define how thinking unfolds.
 
-world_state memory
+Agents
+Structured collaborators with defined roles, constraints, tone boundaries, initiative rules, and Pattern awareness. Agents exist inside Worlds, never globally.
 
-🧩 Patterns (Cartridges)
-
-Reusable workflow templates:
-
-Ideation
-
-Structuring
-
-Insight
-
-Drafting
-
-Refinement
-
-Production
-
-Patterns define how thinking unfolds.
-
-🤖 Agents
-
-Structured collaborators with:
-
-role
-
-personality constraints
-
-initiative levels
-
-tone boundaries
-
-safe behavior rules
-
-Pattern awareness
-
-Agents operate inside Worlds, never globally.
-
-🧠 4-Layer Memory Model
-
+4-Layer Memory Model
 L1 Active — session memory
+L2 Episodic — session summaries and deltas
+L3 Knowledge — stable world files
+L4 Identity — Operator Telos and alignment kernel
 
-L2 Episodic — session summaries & deltas
+META Division
+A structural oversight layer that enforces rules, preserves identity, prevents drift, and validates Feedback Loop updates.
 
-L3 Knowledge — stable docs
+Feedback Loop
+A four-stage process: Operator Exit Poll → META filtering → Agent University micro-adjustments → A0U updates.
+Evolution is controlled, never autonomous.
 
-L4 Identity (Telos) — the Operator’s alignment kernel
+Quickstart
 
-⚖️ META Division
+Define the Operator
+Open the file “02-OPERATOR-TELOS” and fill out identity, values, constraints, communication preferences, reasoning style, and cognitive rhythm.
 
-The Engine’s internal “physics & ethics” system:
+Create a World
+Duplicate the World Template found in the Worlds/Templates folder.
+Define purpose, identity, rules, allowed Patterns, and agent roster.
 
-enforces coherence
+Load Patterns
+Select Patterns from CARTRIDGES-AND-PATTERNS and assign them to the World.
 
-preserves identity
+Configure Agents
+Define each agent’s role, tone, constraints, and behavior.
 
-prevents agent drift
+Begin Working
+Each session usually follows this cycle:
 
-validates Feedback Loop updates
-
-🔄 Operator Feedback Loop
-
-A 4-stage improvement cycle:
-
-Operator Exit Poll
-
-META filtering
-
-Agent University micro-adjustments
-
-A0U updates
-
-Controlled evolution — no autonomous changes.
-
-🚀 Quickstart
-
-Clone or download the repository, then:
-
-1. Define the Operator
-
-Open:
-
-02-OPERATOR-TELOS.md
-
-
-Fill out:
-
-identity
-
-values
-
-constraints
-
-communication preferences
-
-reasoning style
-
-cognitive rhythm
-
-This becomes the Engine’s alignment kernel.
-
-2. Create Your First World
-
-Go to:
-
-/Worlds/Templates/04b-WORLD-TEMPLATE.md
-
-
-Duplicate it, rename it, fill out:
-
-purpose
-
-identity
-
-rules
-
-agents
-
-allowed patterns
-
-3. Activate Patterns
-
-Use Patterns from:
-
-/Patterns/CARTRIDGES-AND-PATTERNS.md
-
-
-Select which ones your World will use.
-
-4. Deploy Agents
-
-Use:
-
-/Agents/
-
-
-to configure roles, tone, constraints, and behavior.
-
-5. Start Working
-
-Every session follows:
-
-Recap the World
+Recap World
 
 Declare intent
 
@@ -193,80 +70,48 @@ Collaborate with agents
 
 Save world_state
 
-Run Feedback Loop
+Run the Feedback Loop
 
-The Engine maintains coherence automatically.
+Vault Structure (High-Level)
 
-📁 Vault Structure (High-Level)
 Loom Engine
-│
-├── 00-LOOM-CONCEPT.md
-├── 01-LOOM-ARCHITECTURE.md
-├── 02-OPERATOR-TELOS.md
-├── 05-CARTRIDGES-AND-PATTERNS.md
-├── 06-AGENT-SYSTEM.md
-├── 07-METHODOLOGY-LOOM.md
-│
-├── /Worlds/
-├── /Agents/
-├── /Patterns/
-├── /Cognitive Layer/
-├── /Engine/
-└── /SAM-FILES/
+00-LOOM-CONCEPT
+01-LOOM-ARCHITECTURE
+02-OPERATOR-TELOS
+05-CARTRIDGES-AND-PATTERNS
+06-AGENT-SYSTEM
+07-METHODOLOGY-LOOM
+Worlds/
+Agents/
+Patterns/
+Cognitive Layer/
+Engine/
+SAM-FILES/
 
-📚 Why the Loom Engine Exists
+Why the Loom Engine Exists
 
-Most creative and strategic projects collapse into:
+Most creative and strategic projects fail due to scattered notes, forgotten decisions, lack of continuity, or drift in tone and direction.
+The Loom Engine solves this by introducing identity, rules, repeatable workflow patterns, modular agents, stable memory, and intentional evolution.
 
-scattered notes
+The Engine becomes a thinking environment, not just a documentation system.
 
-inconsistent decisions
+Roadmap
 
-forgotten progress
+Version 0.2 — Public World examples
+Version 0.3 — Expanded Pattern Library
+Version 0.4 — Tempo System integration
+Version 0.5 — Experimental CLI
+Version 1.0 — Full multi-agent orchestration toolkit
 
-agent drift
+License
 
-over-complex workflows
+If you choose MIT or another license, it will appear here.
 
-The Loom Engine solves this by structuring thought around:
+Contributing
 
-identity
+Loom Engine is modular. Please open an Issue before submitting a pull request.
 
-rules
+Final Note
 
-repeatable patterns
-
-modular agents
-
-stable memory
-
-intentional evolution
-
-It is a thinking environment, not a tool.
-
-🛠 Roadmap
-
-v0.2: Public World examples
-
-v0.3: Pattern Library expansion
-
-v0.4: Integrated Tempo System
-
-v0.5: Loom Engine CLI (experimental)
-
-v1.0: Full multi-agent orchestration toolkit
-
-📄 License
-
-If you add a license (MIT recommended), it will appear here.
-
-🤝 Contributing
-
-The Engine is modular — contributions are welcome via pull requests or issues.
-
-🧵 Final Note
-
-Loom Engine is a framework built for long arcs of meaning, clarity, and creative sovereignty.
-Whether you're building systems, designing stories, running multiple ventures, or managing AI agents, the Loom gives you a stable world for each dimension of your work.
-
-If you'd like, I can also generate:
+Loom Engine is built for long arcs of meaning, clarity, identity, and creative sovereignty.
+Whether you manage multiple ventures, build systems, write, research, or orchestrate AI agents, the Loom gives each dimension of your work a coherent World.
