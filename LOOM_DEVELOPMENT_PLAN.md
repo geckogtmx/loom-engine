@@ -1572,6 +1572,7 @@ Run the **LOOM Prompt Lab** experiment:
 | `WARPS_TAKE.md` | Implementation architecture |
 | `WARP_WORKFLOW_EXAMPLE.md` | Concrete World/Pattern example |
 | `V2 Library/LOOM_V2_Master_Synthesis.md` | V2 feature synthesis |
+| `knowledge/V2.0.0/notes.md` | **V2 Ideas & Scratchpad** (Anti-feature-creep buffer) |
 | `Systems/README.md` | Spines, Dispatcher, cost optimization |
 
 ---

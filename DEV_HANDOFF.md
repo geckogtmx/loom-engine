@@ -9,26 +9,30 @@
 
 ## Current Status
 **Date:** 2026-01-14
-**Phase:** Phase 0 (Foundation) - *Not Started*
+**Phase:** Phase 1 (Core Engine) - *Starting*
 **Last Model:** Gemini
 
 ## Latest Handoff Note
 **Context:**
-We have just finalized the `LOOM_DEVELOPMENT_PLAN.md` and established the `AI_CODEX.md`. The planning is complete. The project is ready for initialization.
+Phase 0 (Foundation) is complete. The monorepo is scaffolded, the Electron shell is running with WebSocket and File Watcher integration, and the DB schema is designed.
 
 **Accomplished:**
-*   Refined Development Plan with robust testing and "Dual-Truth" reconciliation.
-*   Created Multi-Model Governance Protocol (`AI_CODEX`, `CLAUDE`, `GEMINI`).
-*   **Cleaned Root:** Moved all Obsidian files into `knowledge/` structured by category.
+*   Initialized pnpm monorepo (@loom/core, @loom/db, @loom/web, @loom/electron).
+*   Set up Electron 33+ with Vite and React 18.
+*   Integrated WebSocket server (8080) for real-time streaming.
+*   Integrated Chokidar for knowledge base file watching.
+*   Designed initial Drizzle/SQLite schema for L4 (Telos) and L3 (Knowledge).
+*   Established shared types and Zustand store.
+*   Created V2.0.0 scratchpad for anti-feature-creep.
 
 **Pending / Broken:**
-*   No code exists yet.
-*   Monorepo scaffolding needs to be generated.
+*   Actual logic for MD <-> DB reconciliation (Phase 1).
+*   L4 Telos immutability enforcement.
 
 **Next Instruction:**
-*   Initialize the pnpm monorepo structure in the root.
-*   Set up `turbo` and `changesets`.
-*   Install core dependencies (Electron, Vite, React, TypeScript).
+*   Implement the Memory Layer Service in `@loom/core`.
+*   Establish the File Watcher reconciliation logic (MD -> DB sync).
+*   Start Phase 1 deliverables in `LOOM_DEVELOPMENT_PLAN.md`.
 
 ---
 

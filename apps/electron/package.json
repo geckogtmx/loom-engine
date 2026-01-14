@@ -1,0 +1,23 @@
+{
+  "name": "@loom/electron",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./dist/main.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "@types/ws": "^8.18.1",
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8",
+    "typescript": "^5.7.3",
+    "vite": "^6.0.7",
+    "vite-plugin-electron": "^0.29.0"
+  },
+  "dependencies": {
+    "chokidar": "^5.0.0",
+    "ws": "^8.19.0"
+  }
+}
