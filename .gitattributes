@@ -1,0 +1,15 @@
+# Auto-detect text files and perform LF normalization
+* text=auto
+
+# Custom mappings for LOOM
+*.md linguist-documentation
+*.markdown linguist-documentation
+knowledge/**/* linguist-documentation
+
+# Binary files
+*.sqlite binary
+*.db binary
+*.png binary
+*.jpg binary
+*.ico binary
+*.icns binary

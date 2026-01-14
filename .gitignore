@@ -1,0 +1,58 @@
+# --- Dependencies ---
+node_modules
+.pnpm-store
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# --- Build Outputs ---
+dist
+dist-electron
+out
+build
+.turbo
+coverage
+
+# --- OS & Editors ---
+.DS_Store
+Thumbs.db
+.idea
+.vscode
+*.swp
+*.swo
+
+# --- Environment & Secrets ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# --- Database & Storage ---
+*.sqlite
+*.sqlite-journal
+*.db
+*.db-journal
+
+# --- Electron ---
+release/
+/out/
+
+# --- LOOM Runtime (Local Data) ---
+.loom/
+tmp/
+logs/
+
+# --- Obsidian Vault (Knowledge) ---
+# Ignore workspace state (cursor pos, open tabs) which changes constantly
+knowledge/.obsidian/workspace.json
+knowledge/.obsidian/workspace-mobile.json
+knowledge/.obsidian/cache
+knowledge/.obsidian/plugins/*/data.json
+
+# Keep core config (themes, enabled plugins)
+!knowledge/.obsidian/app.json
+!knowledge/.obsidian/appearance.json
+!knowledge/.obsidian/community-plugins.json
+!knowledge/.obsidian/core-plugins.json
