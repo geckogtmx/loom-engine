@@ -16,7 +16,7 @@ Unlike typical "Chat with AI" apps, LOOM is a **thinking environment** that enfo
 
 1.  **Operator Supremacy:** The User (Operator) is the sole source of intent. We never infer intent; we ask.
 2.  **Silence by Default:** Nothing auto-starts. Nothing auto-persists. Every action requires explicit logic or approval.
-3.  **Model Sovereignty:** The system is strictly model-agnostic. It defaults to **Local Models** (Ollama) for privacy and zero-latency fluidity, while seamlessly integrating **Cloud APIs** (OpenAI, Anthropic) as high-power intelligence layers for complex reasoning. You choose the brain for the task.
+3.  **Model Sovereignty:** The system is strictly model-agnostic. It defaults to **Local Models** (Ollama) for privacy and zero-latency fluidity, while seamlessly integrating **Cloud APIs** (OpenAI, Anthropic, Gemini, DeepSeek) as high-power intelligence layers for complex reasoning. You choose the brain for the task.
 4.  **Markdown is Canonical:** The SQLite database is an accelerator. The "real" data lives in Markdown files.
 5.  **Governance:** No component bypasses the META rules engine.
 
