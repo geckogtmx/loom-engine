@@ -11,7 +11,7 @@
 2.  **Silence by Default:** Nothing auto-starts. Nothing auto-persists. Every write to memory (L2/L3/L4) requires explicit logic or approval.
 3.  **World Isolation:** Data never bleeds between Worlds. `SELECT * FROM ... WHERE world_id = ?` is mandatory.
 4.  **Markdown is Canonical:** The SQLite database is an accelerator. The "real" data lives in Markdown files. If they disagree, Markdown wins.
-5.  **Local-First:** We assume the user is offline. We default to `Ollama`. We treat Cloud APIs as "High-Cost Plugins".
+5.  **Model Agnostic & Local-Ready:** The architecture is neutral. We default to Local Models for base functionality to ensure privacy and speed, but the system is designed to act as a harness for *any* model. Cloud usage is an explicit Operator choice, not a dependency.
 
 ## 2. Architecture & Stack
 
