@@ -1,117 +1,74 @@
-Loom Engine
+# LOOM Engine
 
-A modular, operator-first framework for building and managing Project Worlds.
+> **Status:** Phase 0 (Foundation)
+> **Version:** 1.0.0 (Pre-Alpha)
 
-The Loom Engine transforms creative and strategic work into structured Worlds powered by Patterns, Agents, and multi-layer memory. It is designed for clarity, continuity, and scalable thinking across long arcs of work.
+**LOOM Engine** is an **Operator-first cognitive architecture** implemented as a desktop application. It enables structured, governed AI collaboration across long time horizons without losing context, identity, or control.
 
-What Is the Loom Engine?
+Unlike typical "Chat with AI" apps, LOOM is a **thinking environment** that enforces:
+*   **Operator Supremacy:** All systems serve your intent.
+*   **World Isolation:** Projects never bleed data.
+*   **Long-Term Continuity:** 4-Layer Memory Model (Active, Episodic, Knowledge, Identity).
 
-The Loom Engine is a cognitive framework that organizes work into:
+---
 
-Worlds — self-contained project spaces with identity, rules, agents, and memory
-Patterns — structured workflows that define how reasoning unfolds
-Agents — role-bound collaborators with consistent behavior
-Memory Layers — short- and long-term continuity (L1–L4)
-META Division — structural oversight and drift prevention
-Feedback Loop — safe system evolution governed by the Operator
+## Core Philosophy
 
-It is built around one principle:
-The Operator is sovereign. The Engine adapts to the Operator’s identity, tone, constraints, and long-term direction.
+1.  **Operator Supremacy:** The User (Operator) is the sole source of intent. We never infer intent; we ask.
+2.  **Silence by Default:** Nothing auto-starts. Nothing auto-persists. Every action requires explicit logic or approval.
+3.  **Local-First:** We assume the user is offline. We default to **Ollama**. Cloud APIs are "High-Cost Plugins".
+4.  **Markdown is Canonical:** The SQLite database is an accelerator. The "real" data lives in Markdown files.
+5.  **Governance:** No component bypasses the META rules engine.
 
-Core Features
+---
 
-Project Worlds
-Each project becomes its own coherent universe with purpose, identity, rules, constraints, agents, memory, and workflow patterns.
+## Technical Stack
 
-Patterns
-Reusable workflow templates for ideation, structuring, insight, drafting, refinement, and production. Patterns define how thinking unfolds.
+The LOOM Engine is built as a **Local-First Desktop Application**:
 
-Agents
-Structured collaborators with defined roles, constraints, tone boundaries, initiative rules, and Pattern awareness. Agents exist inside Worlds, never globally.
+*   **Runtime:** Electron 33+ (Main/Renderer/Preload separation)
+*   **UI:** React 18, TypeScript, Tailwind CSS 4, shadcn/ui
+*   **State:** Zustand (Client), SQLite + Drizzle (Persistence)
+*   **AI:** Model-Agnostic (Ollama Primary, Cloud Opt-in), LangChain (Orchestration only)
+*   **Package Manager:** pnpm (Monorepo)
 
-4-Layer Memory Model
-L1 Active — session memory
-L2 Episodic — session summaries and deltas
-L3 Knowledge — stable world files
-L4 Identity — Operator Telos and alignment kernel
+---
 
-META Division
-A structural oversight layer that enforces rules, preserves identity, prevents drift, and validates Feedback Loop updates.
+## Architecture Overview
 
-Feedback Loop
-A four-stage process: Operator Exit Poll → META filtering → Agent University micro-adjustments → A0U updates.
-Evolution is controlled, never autonomous.
+LOOM operates on a **4-Layer Memory Model**:
 
-Quickstart
+*   **L4 (Telos):** Read-Only Identity & Core Mandates.
+*   **L3 (Knowledge):** World/Pattern/Agent definitions (The "Vault").
+*   **L2 (Episodic):** Append-only session logs and summaries.
+*   **L1 (Active):** In-memory RAM, flushed on session close.
 
-Define the Operator
-Open the file “02-OPERATOR-TELOS” and fill out identity, values, constraints, communication preferences, reasoning style, and cognitive rhythm.
+For deep architectural details, see the `knowledge/` directory.
 
-Create a World
-Duplicate the World Template found in the Worlds/Templates folder.
-Define purpose, identity, rules, allowed Patterns, and agent roster.
+---
 
-Load Patterns
-Select Patterns from CARTRIDGES-AND-PATTERNS and assign them to the World.
+## Development
 
-Configure Agents
-Define each agent’s role, tone, constraints, and behavior.
+### Prerequisites
+*   Node.js 20+
+*   pnpm 9+
+*   Ollama (for local model support)
 
-Begin Working
-Each session usually follows this cycle:
+### Getting Started
+*Note: The project is currently in scaffolding phase.*
 
-Recap World
+```bash
+# Install dependencies
+pnpm install
 
-Declare intent
+# Start development server
+pnpm dev
+```
 
-Activate a Pattern
+---
 
-Collaborate with agents
+## Documentation
 
-Save world_state
-
-Run the Feedback Loop
-
-Vault Structure (High-Level)
-
-Loom Engine
-00-LOOM-CONCEPT
-01-LOOM-ARCHITECTURE
-02-OPERATOR-TELOS
-05-CARTRIDGES-AND-PATTERNS
-06-AGENT-SYSTEM
-07-METHODOLOGY-LOOM
-Worlds/
-Agents/
-Patterns/
-Cognitive Layer/
-Engine/
-SAM-FILES/
-
-Why the Loom Engine Exists
-
-Most creative and strategic projects fail due to scattered notes, forgotten decisions, lack of continuity, or drift in tone and direction.
-The Loom Engine solves this by introducing identity, rules, repeatable workflow patterns, modular agents, stable memory, and intentional evolution.
-
-The Engine becomes a thinking environment, not just a documentation system.
-
-Roadmap
-
-Version 0.2 — Public World examples
-Version 0.3 — Expanded Pattern Library
-Version 0.4 — Tempo System integration
-Version 0.5 — Experimental CLI
-Version 1.0 — Full multi-agent orchestration toolkit
-
-License
-
-If you choose MIT or another license, it will appear here.
-
-Contributing
-
-Loom Engine is modular. Please open an Issue before submitting a pull request.
-
-Final Note
-
-Loom Engine is built for long arcs of meaning, clarity, identity, and creative sovereignty.
-Whether you manage multiple ventures, build systems, write, research, or orchestrate AI agents, the Loom gives each dimension of your work a coherent World.
+*   **`AI_CODEX.md`**: The Constitution & Technical Standards.
+*   **`LOOM_DEVELOPMENT_PLAN.md`**: The Master Roadmap.
+*   **`knowledge/`**: The detailed concept and architectural documentation.
