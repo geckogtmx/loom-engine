@@ -1,51 +1,50 @@
+import { Spine } from './types';
 
-// packages/core/src/dispatcher/SpineGenerator.ts
-
-import { PatternDef } from '../pattern/types';
-import { PatternRegistry } from '../pattern/PatternRegistry';
-
-/**
- * The SpineGenerator is the "Brain" of the Dispatcher.
- * It analyzes the vast context of the L2 (Episodic) and L3 (Knowledge)
- * to determine the "Spine" (The sequence of Patterns) needed to achieve the Goal.
- */
 export class SpineGenerator {
-    constructor(private registry: PatternRegistry) { }
-
     /**
-     * Generates a recommended Pattern ID based on the user's intent.
-     * In a full implementation, this uses an embedding search or LLM reasoning.
-     * For Phase 5/6 Research, we use keyword heuristics.
+     * Generates a "Spine" from raw content.
+     * A Spine is a compressed representation (keywords, summary) used for
+     * low-cost relevance matching before full context loading.
      */
-    async determinePattern(userQuery: string): Promise<PatternDef | null> {
-        const queryLower = userQuery.toLowerCase();
+    generate(
+        id: string,
+        sourceId: string,
+        type: 'L3_DOC' | 'L2_EPISODE' | 'PATTERN' | 'AGENT',
+        content: string
+    ): Spine {
+        const cleanContent = content.trim();
 
-        // Heuristic mapping (Prototype)
-        if (queryLower.includes('compare') || queryLower.includes('contrast')) {
-            // return this.registry.getByName('Comparator'); // Not made yet
-        }
+        // 1. Keyword Extraction (Heuristic for now, could be TF-IDF or weak LLM later)
+        const keywords = this.extractKeywords(cleanContent);
 
-        if (queryLower.includes('options') || queryLower.includes('ideas') || queryLower.includes('brainstorm')) {
-            return this.registry.getByName('Option Burst');
-        }
+        // 2. Summary (First 200 chars or first paragraph)
+        // In full implementation, this might use a small model (Phi-3) to summarize
+        const summary = cleanContent.length > 200
+            ? cleanContent.substring(0, 197) + '...'
+            : cleanContent;
 
-        if (queryLower.includes('fact') || queryLower.includes('true') || queryLower.includes('verify')) {
-            return this.registry.getByName('Fact Check');
-        }
+        // 3. Token Estimate (Roughly 4 chars per token)
+        const tokens = Math.ceil(summary.length / 4);
 
-        if (queryLower.includes('metaphor') || queryLower.includes('analogy')) {
-            return this.registry.getByName('Metaphor Bloom');
-        }
+        return {
+            id,
+            sourceId,
+            type,
+            content: summary,
+            keywords,
+            tokens
+        };
+    }
 
-        if (queryLower.includes('story') || queryLower.includes('narrative')) {
-            return this.registry.getByName('Narrative Spine');
-        }
+    private extractKeywords(text: string): string[] {
+        // Simple stop-word removal and frequency (Mock implementation)
+        const stopWords = new Set(['the', 'and', 'is', 'in', 'to', 'of', 'sys', 'a']);
+        const words = text.toLowerCase()
+            .replace(/[^\w\s]/g, '')
+            .split(/\s+/)
+            .filter(w => w.length > 3 && !stopWords.has(w));
 
-        if (queryLower.includes('structure') || queryLower.includes('framework')) {
-            return this.registry.getByName('Framework Forge');
-        }
-
-        // Default fallback? Or null?
-        return null;
+        // Return unique top words (just unique for now)
+        return Array.from(new Set(words)).slice(0, 10);
     }
 }

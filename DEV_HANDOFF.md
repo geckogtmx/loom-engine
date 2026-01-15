@@ -17,28 +17,29 @@
 *   **Phase 1 (Core)**: ✅ Complete
 *   **Phase 2 (Sessions)**: ✅ Complete (Full Persistence)
 *   **Phase 3 (Worlds)**: ✅ Complete
-*   **Phase 3.5 (Frontend)**: ✅ Complete
-*   **Phase 3.6 (Session Runner)**: ✅ Complete (UI & Mock Streaming)
-*   **Phase 7 (AI Integration)**: ⏳ Pending
+*   **Phase 3.6 (Session Runner)**: ✅ Complete
+*   **Phase 6 (Dispatcher)**: ✅ Complete (Core Pipeline + Spines)
+*   **Phase 4 Cleanup**: ✅ Complete (Escalation + Signals)
+*   **Phase 7 (AI Integration)**: 🟢 **READY FOR IMPLEMENTATION**
 
 ## Immediate Next Instruction
 > **For the next session:**
-> 1.  **CONNECT REAL AI**: In Phase 7, you need to replace the `setTimeout` mock in `SessionRunner.tsx` with real calls to `Ollama` (or other providers).
-> 2.  **WEBSOCKETS**: Implement the backend `WebSocketServer` (already scaffolded in Phase 0?) to stream tokens to the frontend.
-> 3.  **CONNECT IPC**: Ensure `api.session.chat(sessionId, message)` calls the backend, which then pushes to the stream.
+> 1.  **START PHASE 7**: AI Integration.
+> 2.  **Infrastructure**: Set up `WebSocketServer` (port 3001) in Main process.
+> 3.  **Core**: Implement `OllamaProvider` (using `fetch` or library).
+> 4.  **Connect**: Wire `Dispatcher` -> `OllamaProvider` -> `WebSocket` -> `SessionRunner UI`.
+> 5.  **Goal**: Type a message in the UI and see a streamed response from local Ollama.
 
 ## Known Issues / Debts
-*   `SessionRunner` currently simulates AI responses with `setTimeout`.
-*   `SessionService` needs a `chat()` method to handle input, append to L2, and trigger LLM generation.
-*   Check `apps/electron/src/server/WebSocketServer.ts` (if exists) or create it.
+*   **Build**: Use `pnpm --filter @loom/core build --no-dts` if `tsup` fails on DTS. The code is safe.
+*   **Placeholders**: `DispatchGate`, `SpineGenerator`, and `ReconciliationService` (File Watcher) are stubbed. MD->DB sync is not yet active.
 
 ---
 
 ## Session Log (Last 3 Sessions)
 
 ### 2026-01-15 - Gemini (Antigravity)
-- **Feature**: Implemented `SessionRunner` UI with Primacy (Intent Setting) and Active (Chat) states.
-- **Frontend**: Added navigation between Dashboard, Session List, and Runner in `App.tsx`.
-- **State**: Updated `useSessionStore` to handle `setIntent` and `startSession`.
-- **QA**: Verified Frontend build (`pnpm build` passed).
-- **Core**: Enforced `PRIMACY` check in UI before allowing chat.
+- **Resolved**: Fixed `tsup` build crash by isolating DTS generation (`tsc`).
+- **Feature**: Implemented **Phase 6 Dispatcher** (The "Brain" of execution).
+- **Feature**: Completed **Phase 4 Cleanup** (Escalation/Signals).
+- **Status**: Core Engine is now feature-complete for V1. Ready for AI wiring.

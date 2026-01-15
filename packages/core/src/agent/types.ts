@@ -11,6 +11,19 @@ export enum AgentSignalType {
     ALIGNMENT = 'ALIGNMENT'
 }
 
+export enum EscalationLevel {
+    NONE = 'NONE',
+    LOW = 'LOW',       // e.g., uncertainty, repeating
+    MEDIUM = 'MEDIUM', // e.g., explicit tool error, blockage
+    CRITICAL = 'CRITICAL' // e.g., safety violation, explicit user overload
+}
+
+export interface EscalationResult {
+    level: EscalationLevel;
+    reason?: string;
+    suggestedAction?: string;
+}
+
 // ============================================
 // CORE INTERFACES
 // ============================================

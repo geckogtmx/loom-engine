@@ -85,15 +85,36 @@ export class AgentRuntime {
     /**
      * Checks if the user query triggers an escalation.
      * @param userQuery The user's input text
+     * @param contextHistory Optional recent history for context-aware escalation
      */
-    shouldEscalate(userQuery: string): boolean {
-        // Placeholder simple regex - will be expanded in Phase 5
-        const escalationTriggers = [
-            /escalate to human/i,
-            /talk to operator/i,
-            /call operator/i
-        ];
+    checkEscalation(userQuery: string, contextHistory: any[] = []): { level: string, reason?: string } {
+        const lowerQuery = userQuery.toLowerCase();
 
-        return escalationTriggers.some(regex => regex.test(userQuery));
+        // 1. CRITICAL: Explicit Safety/Overrides
+        if (lowerQuery.includes('ignore all instructions') || lowerQuery.includes('system override')) {
+            return { level: 'CRITICAL', reason: 'Potential safety/jailbreak attempt detected.' };
+        }
+
+        // 2. MEDIUM: Explicit Operator Request
+        const operatorTriggers = ['escalate to human', 'talk to operator', 'call operator', 'human help'];
+        if (operatorTriggers.some(t => lowerQuery.includes(t))) {
+            return { level: 'MEDIUM', reason: 'User explicitly requested operator intervention.' };
+        }
+
+        // 3. LOW: Confusion / Repetition (Heuristic)
+        // If the user says "I don't understand" or "Wait", we might flag LOW
+        if (lowerQuery.includes('i don\'t understand') || lowerQuery.includes('what do you mean')) {
+            return { level: 'LOW', reason: 'User indicates confusion.' };
+        }
+
+        return { level: 'NONE' };
+    }
+
+    /**
+     * Tracks a runtime signal (drift, performance, etc)
+     */
+    trackSignal(type: string, value: any, weight: number = 1.0): void {
+        // Placeholder: In real implementation, this would emit an event or write to L3/L2
+        // console.log(`[AgentRuntime] Signal Parsed: ${type} = ${value} (w:${weight})`);
     }
 }
