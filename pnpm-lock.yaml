@@ -46,6 +46,9 @@ importers:
       dotenv:
         specifier: ^17.2.3
         version: 17.2.3
+      drizzle-orm:
+        specifier: ^0.38.3
+        version: 0.38.4(@types/better-sqlite3@7.6.13)(@types/react@18.3.27)(better-sqlite3@11.10.0)(react@18.3.1)
       uuid:
         specifier: ^9.0.0
         version: 9.0.1
@@ -57,8 +60,8 @@ importers:
         version: 3.25.76
     devDependencies:
       '@types/uuid':
-        specifier: ^11.0.0
-        version: 11.0.0
+        specifier: ^9.0.8
+        version: 9.0.8
       '@types/ws':
         specifier: ^8.18.1
         version: 8.18.1
@@ -152,8 +155,8 @@ importers:
         version: 3.25.76
     devDependencies:
       '@types/uuid':
-        specifier: ^11.0.0
-        version: 11.0.0
+        specifier: ^9.0.8
+        version: 9.0.8
       '@vitest/coverage-v8':
         specifier: ^2.1.8
         version: 2.1.9(vitest@2.1.9(@types/node@25.0.8))
@@ -927,9 +930,8 @@ packages:
   '@types/responselike@1.0.3':
     resolution: {integrity: sha512-H/+L+UkTV33uf49PH5pCAUBVPNj2nDBXTN+qS1dOwyyg24l3CcicicCA7ca+HMvJBZcFgl5r8e+RR6elsb4Lyw==}
 
-  '@types/uuid@11.0.0':
-    resolution: {integrity: sha512-HVyk8nj2m+jcFRNazzqyVKiZezyhDKrGUA3jlEcg/nZ6Ms+qHwocba1Y/AaVaznJTAM9xpdFSh+ptbNrhOGvZA==}
-    deprecated: This is a stub types definition. uuid provides its own type definitions, so you do not need this installed.
+  '@types/uuid@9.0.8':
+    resolution: {integrity: sha512-jg+97EGIcY9AGHJJRaaPVgetKDsrTgbRjQ5Msgjh/DQKEFl0DtyRr/VCOyD1T2R1MNeWPK/u7JoGhlDZnKBAfA==}
 
   '@types/verror@1.10.11':
     resolution: {integrity: sha512-RlDm9K7+o5stv0Co8i8ZRGxDbrTxhJtgjqjFyVh/tXQyl/rYtTKlnTvZ88oSTeYREWurwx20Js4kTuKCsFkUtg==}
@@ -3605,9 +3607,7 @@ snapshots:
     dependencies:
       '@types/node': 25.0.8
 
-  '@types/uuid@11.0.0':
-    dependencies:
-      uuid: 9.0.1
+  '@types/uuid@9.0.8': {}
 
   '@types/verror@1.10.11':
     optional: true

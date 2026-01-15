@@ -3,7 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { WebSocketServer } from 'ws';
 import chokidar from 'chokidar';
-import { registerSessionHandlers } from './ipc/sessionHandlers';
+import { registerSessionHandlers, validateSessionToken } from './ipc/sessionHandlers';
 import { registerWorldHandlers } from './ipc/worldHandlers';
 import { createDb } from '@loom/db';
 import { SecureKeyStore } from './services/SecureKeyStore';
@@ -14,22 +14,38 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dbPath = process.env.DB_PATH || path.join(app.getPath('userData'), 'loom.db');
 
 // WebSocket Server for Streaming
-// WebSocket Server for Streaming
 const wss = new WebSocketServer({ port: 8080 });
+const connectionRateLimit = new Map<string, number>();
+
 wss.on('connection', (ws, req) => {
+  const ip = req.socket.remoteAddress || 'unknown';
+  const now = Date.now();
+
+  // Rate Limiting (Phase 7.9)
+  // Max 5 connections per 10 seconds per IP
+  const lastConn = connectionRateLimit.get(ip) || 0;
+  if (now - lastConn < 2000) { // 2s debounce roughly
+    console.warn(`[SECURITY] Rate limit blocked IP: ${ip}`);
+    ws.close(3000, 'Rate Limit');
+    return;
+  }
+  connectionRateLimit.set(ip, now);
+
+  // Clean up rate limit map
+  if (connectionRateLimit.size > 1000) connectionRateLimit.clear();
+
   const url = new URL(req.url || '', `http://${req.headers.host}`);
   const token = url.searchParams.get('token');
 
   // Simple token validation (Phase 7.5)
-  // In a real scenario, we would check this against the active SessionService
-  // For now, checks presence and basic structure (session_id:uuid)
-  if (!token || !token.includes(':')) {
-    console.warn('[SECURITY] Blocked unauthorized WebSocket connection attempt');
+  // Check against active sessions in memory
+  if (!validateSessionToken(token)) {
+    console.warn(`[SECURITY] Blocked unauthorized WebSocket connection attempt. Token: ${token || 'missing'}`);
     ws.close(3000, 'Unauthorized');
     return;
   }
 
-  console.log(`[WebSocket] UI connected with verified token: ${token.substring(0, 8)}...`);
+  console.log(`[WebSocket] UI connected with verified token: ${(token || '').substring(0, 8)}...`);
 
   ws.on('message', (message) => {
     // Only process messages from authenticated sockets
@@ -56,6 +72,7 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
+      webSecurity: true, // Explicitly enabled (Phase 7.9)
     },
     backgroundColor: '#0f172a',
     titleBarStyle: 'hidden',

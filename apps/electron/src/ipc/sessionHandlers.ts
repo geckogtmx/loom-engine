@@ -13,6 +13,8 @@ import { createDb } from '@loom/db';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { ZodError } from 'zod';
+import { A0Enforcer } from '@loom/core/src/governance/a0';
+const a0 = new A0Enforcer();
 
 // Initialize DB and Service outside of handler to keep it singleton-ish
 // In a real app we might want a ServiceContainer or similar
@@ -37,6 +39,9 @@ export function registerSessionHandlers(dbPath: string): void {
     ipcMain.handle(SessionChannels.CREATE, async (event: IpcMainInvokeEvent, input: unknown) => {
         try {
             const { worldId } = CreateSessionSchema.parse(input);
+            if (!a0.enforce('session:create', { worldId })) {
+                throw new Error('Governance Blocked: session:create');
+            }
             console.log(`[IPC] Creating session for world ${worldId}`);
             const service = new SessionService(worldId, sessionRepo, checkpointRepo);
 
@@ -102,6 +107,9 @@ export function registerSessionHandlers(dbPath: string): void {
     ipcMain.handle(SessionChannels.SET_INTENT, async (event: IpcMainInvokeEvent, input: unknown) => {
         try {
             const { sessionId, goal, audience, constraints } = SetIntentSchema.parse(input);
+            if (!a0.enforce('session:intent:set', { sessionId, goal })) {
+                throw new Error('Governance Blocked: session:intent:set');
+            }
             const service = sessions.get(sessionId);
             if (!service) throw new Error('Session not found active');
 
@@ -119,6 +127,11 @@ export function registerSessionHandlers(dbPath: string): void {
     ipcMain.handle(SessionChannels.START, async (event: IpcMainInvokeEvent, sessionId: unknown) => {
         try {
             const validated = SessionIdSchema.parse(sessionId);
+
+            if (!a0.enforce('session:start', { sessionId: validated })) {
+                throw new Error('Governance Blocked: session:start');
+            }
+
             const service = sessions.get(validated);
             if (!service) throw new Error('Session not found active');
 
@@ -136,6 +149,11 @@ export function registerSessionHandlers(dbPath: string): void {
     ipcMain.handle(SessionChannels.END, async (event: IpcMainInvokeEvent, sessionId: unknown) => {
         try {
             const validated = SessionIdSchema.parse(sessionId);
+
+            if (!a0.enforce('session:end', { sessionId: validated })) {
+                throw new Error('Governance Blocked: session:end');
+            }
+
             const service = sessions.get(validated);
             if (!service) throw new Error('Session not found active');
 
@@ -170,4 +188,18 @@ export function registerSessionHandlers(dbPath: string): void {
     });
 
     console.log('[IPC] Session handlers registered with Zod validation.');
+}
+
+/**
+ * Validates a WebSocket authentication token against active sessions.
+ * @param token format: sessionId:randomToken
+ */
+export function validateSessionToken(token: string | null): boolean {
+    if (!token || !token.includes(':')) return false;
+
+    const [sessionId] = token.split(':');
+    const service = sessions.get(sessionId);
+
+    if (!service) return false;
+    return service.validateToken(token);
 }

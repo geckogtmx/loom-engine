@@ -140,9 +140,21 @@ export class SessionService {
      * In a real system, this would be signed (JWT) or stored in Redis.
      * For local electron app, a simple UUID linked to the session ID suffices.
      */
+    private activeToken: string | null = null;
+
+    /**
+     * Generates a temporary authentication token for WebSocket connections.
+     * In a real system, this would be signed (JWT) or stored in Redis.
+     * For local electron app, a simple UUID linked to the session ID suffices.
+     */
     generateSessionToken(): string {
         // Format: session_id:random_token
         // This allows the WS server to validate ownership
-        return `${this.id}:${uuidv4()}`;
+        this.activeToken = `${this.id}:${uuidv4()}`;
+        return this.activeToken;
+    }
+
+    validateToken(token: string): boolean {
+        return this.activeToken === token;
     }
 }

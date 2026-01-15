@@ -1,5 +1,5 @@
 import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
-import { sessions } from '@loom/db/src/schema/memory';
+import { sessions } from '@loom/db';
 import { eq, and } from 'drizzle-orm';
 import { ISessionRepository, SessionData } from './repository';
 import { SessionState } from './types';

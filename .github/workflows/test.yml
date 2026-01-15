@@ -28,6 +28,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Security Audit
+        run: pnpm audit --audit-level=high
+
       - name: Run tests with coverage
         run: pnpm --filter @loom/core test:coverage
 

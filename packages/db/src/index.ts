@@ -6,6 +6,9 @@ import * as encryptedKeys from './schema/encryptedKeys';
 
 export const createDb = (path: string) => {
   const sqlite = new Database(path);
+  // Phase 7.9: Database Hardening
+  sqlite.pragma('journal_mode = WAL'); // Better concurrency
+  sqlite.pragma('foreign_keys = ON'); // Enforce integrity
   return drizzle(sqlite, { schema: { ...schema, ...memory, ...encryptedKeys } });
 };
 

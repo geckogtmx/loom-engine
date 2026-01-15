@@ -4,9 +4,18 @@
     "outDir": "./dist",
     "rootDir": "./src"
   },
-  "include": ["src"],
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "**/*.test.ts"
+  ],
   "references": [
-    { "path": "../../packages/core" },
-    { "path": "../../packages/db" }
+    {
+      "path": "../../packages/core"
+    },
+    {
+      "path": "../../packages/db"
+    }
   ]
 }

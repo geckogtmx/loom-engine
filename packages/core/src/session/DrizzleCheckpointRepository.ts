@@ -1,5 +1,5 @@
 import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
-import { session_checkpoints } from '@loom/db/src/schema/memory';
+import { session_checkpoints } from '@loom/db';
 import { eq, desc, asc } from 'drizzle-orm';
 import { ICheckpointRepository, CheckpointRecord } from './repository';
 
