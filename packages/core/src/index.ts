@@ -17,6 +17,14 @@ export * from './dispatcher/SpineGenerator';
 export * from './dispatcher/ContextAssembler';
 export * from './dispatcher/Dispatcher';
 
+// LLM Providers
+export * from './llm/types';
+export * from './llm/providers/OllamaProvider';
+export * from './llm/providers/OpenAIProvider';
+export * from './llm/providers/AnthropicProvider';
+export * from './llm/ProviderFactory';
+export * from './llm/SystemPromptBuilder';
+
 // Agent
 export * from './agent/types';
 export * from './agent/AgentRuntime';

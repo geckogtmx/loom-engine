@@ -3,8 +3,10 @@ export interface DispatchContext {
     worldId: string;
     query: string;
     l1Active?: any;
-    l2History?: any[]; // Simplified for now
+    l2History?: any[];
     l3Relevant?: any[];
+    modelPreference?: string; // Optional model override (e.g., 'qwen2.5:14b', 'gpt-4o')
+    agentMode?: string; // Optional Agent mode to activate (e.g., 'Deep Dive Mode')
 }
 
 export interface DispatchResult {
