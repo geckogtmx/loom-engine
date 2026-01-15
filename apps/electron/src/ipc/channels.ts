@@ -20,4 +20,21 @@ export const SessionChannels = {
     STREAM_OUTPUT: 'ws:stream-output'
 } as const;
 
+export const WorldChannels = {
+    CREATE: 'world:create',
+    GET: 'world:get',
+    LIST: 'world:list',
+    UPDATE: 'world:update',
+    DELETE: 'world:delete',
+
+    // Config
+    GET_CONFIG: 'world:get-config',
+    UPDATE_CONFIG: 'world:update-config',
+
+    // Telos
+    GET_TELOS: 'world:get-telos',
+    UPDATE_TELOS: 'world:update-telos',
+} as const;
+
 export type SessionChannel = typeof SessionChannels[keyof typeof SessionChannels];
+export type WorldChannel = typeof WorldChannels[keyof typeof WorldChannels];

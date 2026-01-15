@@ -70,4 +70,14 @@ export class SessionIntentEnvelopeImpl implements SessionIntentEnvelope {
 
         this._sealedAt = new Date();
     }
+    toJSON(): Record<string, any> {
+        return {
+            id: this.id,
+            worldId: this.worldId,
+            goal: this._goal,
+            constraints: this._constraints,
+            audience: this._audience,
+            sealedAt: this._sealedAt
+        };
+    }
 }

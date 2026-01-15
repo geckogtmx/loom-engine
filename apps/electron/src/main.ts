@@ -4,8 +4,12 @@ import { fileURLToPath } from 'url';
 import { WebSocketServer } from 'ws';
 import chokidar from 'chokidar';
 import { registerSessionHandlers } from './ipc/sessionHandlers';
+import { registerWorldHandlers } from './ipc/worldHandlers';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// Configuration
+const dbPath = process.env.DB_PATH || path.join(app.getPath('userData'), 'loom.db');
 
 // WebSocket Server for Streaming
 const wss = new WebSocketServer({ port: 8080 });
@@ -49,7 +53,8 @@ function createWindow() {
 
 app.whenReady().then(() => {
   createWindow();
-  registerSessionHandlers();
+  registerSessionHandlers(dbPath);
+  registerWorldHandlers(dbPath);
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();

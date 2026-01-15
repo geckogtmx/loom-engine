@@ -1,12 +1,17 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { SessionService } from './SessionService';
 import { SessionState } from './types';
+import { InMemorySessionRepository, InMemoryCheckpointRepository } from './test-utils';
 
 describe('SessionService Integration', () => {
     let service: SessionService;
+    let sessionRepo: InMemorySessionRepository;
+    let checkpointRepo: InMemoryCheckpointRepository;
 
     beforeEach(() => {
-        service = new SessionService('world-test');
+        sessionRepo = new InMemorySessionRepository();
+        checkpointRepo = new InMemoryCheckpointRepository();
+        service = new SessionService('world-test', sessionRepo, checkpointRepo);
     });
 
     it('should complete full lifecycle: PENDING → ACTIVE → CLOSED', async () => {
@@ -54,7 +59,7 @@ describe('SessionService Integration', () => {
     });
 
     it('should have a unique session ID', () => {
-        const service2 = new SessionService('world-test');
+        const service2 = new SessionService('world-test', sessionRepo, checkpointRepo);
         expect(service.id).not.toBe(service2.id);
     });
 });

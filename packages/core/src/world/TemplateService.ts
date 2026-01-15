@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import { WorldTemplate, ITemplateRepository } from './types';
+import { WorldTemplate } from './types';
+import { ITemplateRepository } from './repository';
 
 export class InMemoryTemplateRepository implements ITemplateRepository {
     private templates: Map<string, WorldTemplate> = new Map();

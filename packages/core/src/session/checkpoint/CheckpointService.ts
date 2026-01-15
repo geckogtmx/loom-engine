@@ -1,18 +1,25 @@
+import { v4 as uuidv4 } from 'uuid';
 import { CheckpointData, CheckpointTrigger, CheckpointConfig } from './types';
-import { IMemoryLayer } from '../../memory/types';
 import { L1ActiveLayer, L2EpisodicLayer } from '../../memory/layers';
+import { ICheckpointRepository } from '../repository';
 
 export class CheckpointService {
     private config: CheckpointConfig;
     private lastCheckpointTime: number;
     private stepCount: number;
+    private repository: ICheckpointRepository;
 
-    constructor(config: CheckpointConfig = { timeIntervalMs: 600000, stepInterval: 5 }) {
+    constructor(
+        repository: ICheckpointRepository,
+        config: CheckpointConfig = { timeIntervalMs: 600000, stepInterval: 5 }
+    ) {
+        this.repository = repository;
         this.config = config;
         this.lastCheckpointTime = Date.now();
         this.stepCount = 0;
     }
 
+    // ... shouldCheckpoint remains the same ...
     shouldCheckpoint(trigger: CheckpointTrigger): boolean {
         if (trigger === CheckpointTrigger.MANUAL || trigger === CheckpointTrigger.ON_FAILURE) {
             return true;
@@ -41,19 +48,28 @@ export class CheckpointService {
         l1: L1ActiveLayer,
         l2: L2EpisodicLayer
     ): Promise<CheckpointData> {
-        // In a real implementation, we would serialize L1 generically.
-        // For now, we assume L1 has a method to get a snapshot or we iterate.
-        // We'll access the private store via any cast or add a method to L1 later.
-        const l1Snapshot = {}; // Placeholder for serialization
+        // Pseudo-snapshot of L1
+        // In reality, L1 should provide a serializable export
+        const l1Snapshot = JSON.stringify({});
 
         const data: CheckpointData = {
             sessionId,
             timestamp: Date.now(),
             trigger,
             state,
-            l1Snapshot,
-            l2Count: 0 // Placeholder
+            l1Snapshot: {}, // This type might need adjustment if CheckpointData expects object, repo expects string
+            l2Count: 0
         };
+
+        // Persist
+        await this.repository.create({
+            id: uuidv4(),
+            sessionId,
+            trigger,
+            l1Snapshot,
+            stepCount: this.stepCount,
+            createdAt: new Date(data.timestamp)
+        });
 
         // Reset counters
         this.lastCheckpointTime = Date.now();
@@ -61,8 +77,7 @@ export class CheckpointService {
             this.stepCount = 0;
         }
 
-        // TODO: Persist to disk/DB (Draft mode)
-        console.log(`[Checkpoint] Created for session ${sessionId} via ${trigger}`);
+        console.log(`[Checkpoint] Created and persisted for session ${sessionId} via ${trigger}`);
 
         return data;
     }

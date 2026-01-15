@@ -17,7 +17,11 @@
     "vite-plugin-electron": "^0.29.0"
   },
   "dependencies": {
+    "@loom/core": "workspace:^",
+    "@loom/db": "workspace:^",
+    "better-sqlite3": "^11.7.0",
     "chokidar": "^5.0.0",
+    "dotenv": "^17.2.3",
     "ws": "^8.19.0"
   }
 }

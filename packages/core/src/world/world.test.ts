@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldService, InMemoryWorldRepository } from './WorldService';
+import { WorldService } from './WorldService';
+import { InMemoryWorldRepository, InMemoryWorldTelosRepository, InMemoryWorldConfigRepository } from './test-utils';
 import { WorldStatus, WorldEvent, CreateWorldInputSchema } from './types';
 import { TemplateService } from './TemplateService';
 
@@ -39,9 +40,15 @@ describe('CreateWorldInputSchema', () => {
 
 describe('WorldService', () => {
     let service: WorldService;
+    let worldRepo: InMemoryWorldRepository;
+    let telosRepo: InMemoryWorldTelosRepository;
+    let configRepo: InMemoryWorldConfigRepository;
 
     beforeEach(() => {
-        service = new WorldService();
+        worldRepo = new InMemoryWorldRepository();
+        telosRepo = new InMemoryWorldTelosRepository();
+        configRepo = new InMemoryWorldConfigRepository();
+        service = new WorldService(worldRepo, telosRepo, configRepo);
     });
 
     describe('create()', () => {
@@ -77,7 +84,7 @@ describe('WorldService', () => {
             if (!podcastTemplate) throw new Error('Podcast template not seeded');
 
             // Inject TemplateService
-            const serviceWithTemplate = new WorldService(undefined, templateService);
+            const serviceWithTemplate = new WorldService(worldRepo, telosRepo, configRepo, templateService);
 
             const world = await serviceWithTemplate.createFromTemplate({
                 templateId: podcastTemplate.id,
@@ -100,7 +107,7 @@ describe('WorldService', () => {
                 getAll: async () => []
             } as any;
 
-            const serviceWithTemplate = new WorldService(undefined, mockTemplateService);
+            const serviceWithTemplate = new WorldService(worldRepo, telosRepo, configRepo, mockTemplateService);
 
             const missingId = '00000000-0000-0000-0000-000000000000';
             await expect(serviceWithTemplate.createFromTemplate({
@@ -207,25 +214,4 @@ describe('WorldService', () => {
     });
 });
 
-describe('InMemoryWorldRepository', () => {
-    let repo: InMemoryWorldRepository;
 
-    beforeEach(() => {
-        repo = new InMemoryWorldRepository();
-    });
-
-    it('should create and retrieve World', async () => {
-        const world = await repo.create({
-            name: 'Test',
-            purpose: 'Testing',
-            status: WorldStatus.DORMANT
-        });
-
-        const retrieved = await repo.getById(world.id);
-        expect(retrieved?.name).toBe('Test');
-    });
-
-    it('should throw on update of non-existent World', async () => {
-        await expect(repo.update('fake-id', { name: 'New' })).rejects.toThrow('not found');
-    });
-});

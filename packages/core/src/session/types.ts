@@ -28,3 +28,26 @@ export interface SessionContext {
     startTime: Date;
     modelPreferences?: Record<string, string>; // agentId -> modelId
 }
+
+export enum CheckpointTrigger {
+    MANUAL = 'MANUAL',
+    TIME = 'TIME',
+    STEP_COUNT = 'STEP_COUNT',
+    ON_FAILURE = 'ON_FAILURE'
+}
+
+export interface CheckpointConfig {
+    timeIntervalMs?: number;
+    stepInterval?: number;
+}
+
+export interface CheckpointData {
+    id?: string; // Optional for creation before DB
+    sessionId: string;
+    timestamp: number;
+    trigger: CheckpointTrigger;
+    state: string;
+    l1Snapshot: any;
+    l2Count: number;
+    stepCount?: number;
+}

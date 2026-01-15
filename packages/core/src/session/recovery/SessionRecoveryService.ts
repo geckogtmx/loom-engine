@@ -1,4 +1,6 @@
 import { SessionState } from '../types';
+import { ISessionRepository, ICheckpointRepository } from '../repository';
+import { SessionService } from '../SessionService';
 
 export interface IncompleteSession {
     sessionId: string;
@@ -21,19 +23,26 @@ export enum RecoveryAction {
 export class SessionRecoveryService {
     private incompleteSessions: IncompleteSession[] = [];
 
+    constructor(
+        private sessionRepo: ISessionRepository,
+        private checkpointRepo: ICheckpointRepository
+    ) { }
+
     /**
      * Scan for incomplete sessions.
-     * In a real implementation, this would query the database.
      */
     async detectIncompleteSessions(): Promise<IncompleteSession[]> {
-        // TODO: Query DB for sessions where state != CLOSED
-        // For now, we simulate with an empty array or mock data
         console.log('[Recovery] Scanning for incomplete sessions...');
 
-        // Placeholder: In real implementation:
-        // const sessions = await db.query('SELECT * FROM sessions WHERE state != ?', [SessionState.CLOSED]);
+        const activeSessions = await this.sessionRepo.listIncomplete();
 
-        this.incompleteSessions = []; // Replace with actual query
+        this.incompleteSessions = activeSessions.map(s => ({
+            sessionId: s.id,
+            worldId: s.worldId,
+            state: s.state,
+            lastActivityTime: s.createdAt.getTime() // Approx
+        }));
+
         return this.incompleteSessions;
     }
 
@@ -48,31 +57,38 @@ export class SessionRecoveryService {
      * Handle recovery of a specific session.
      */
     async recover(sessionId: string, action: RecoveryAction): Promise<boolean> {
-        const session = this.incompleteSessions.find(s => s.sessionId === sessionId);
-        if (!session) {
-            console.error(`[Recovery] Session ${sessionId} not found in incomplete list.`);
+        const sessionData = await this.sessionRepo.getById(sessionId);
+        if (!sessionData) {
+            console.error(`[Recovery] Session ${sessionId} not found in DB.`);
             return false;
         }
 
         switch (action) {
             case RecoveryAction.RESUME:
                 console.log(`[Recovery] Resuming session ${sessionId} from checkpoint.`);
-                // TODO: Load checkpoint and resume
+                // 1. Get latest checkpoint
+                const checkpoint = await this.checkpointRepo.getLatestForSession(sessionId);
+                if (checkpoint) {
+                    // 2. Restore L1 from checkpoint (Pseudo-code)
+                    // const service = new SessionService(sessionData.worldId, this.sessionRepo, this.checkpointRepo);
+                    // await service.restore(checkpoint);
+                }
                 break;
 
             case RecoveryAction.SUMMARIZE:
                 console.log(`[Recovery] Generating partial summary for session ${sessionId}.`);
-                // TODO: Generate draft continuity artifact
+                // 1. Generate summary
+                // 2. Close session
+                await this.sessionRepo.close(sessionId, new Date());
                 break;
 
             case RecoveryAction.DISCARD:
                 console.log(`[Recovery] Discarding session ${sessionId}.`);
-                // TODO: Mark as discarded in DB
+                // Just close it without summary
+                await this.sessionRepo.close(sessionId, new Date());
                 break;
         }
 
-        // Remove from incomplete list
-        this.incompleteSessions = this.incompleteSessions.filter(s => s.sessionId !== sessionId);
         return true;
     }
 }

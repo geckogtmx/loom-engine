@@ -8,112 +8,17 @@ import {
     CreateWorldInputSchema,
     UpdateWorldInput,
     UpdateWorldInputSchema,
-    IWorldRepository,
     CreateFromTemplateInput,
     CreateFromTemplateInputSchema,
     CloneWorldInput,
     CloneWorldInputSchema,
-    IWorldTelosRepository,
-    IWorldConfigRepository,
-    WorldTelos,
-    WorldConfig
 } from './types';
+import {
+    IWorldRepository,
+    IWorldTelosRepository,
+    IWorldConfigRepository
+} from './repository';
 import { TemplateService } from './TemplateService';
-
-/**
- * In-Memory World Repository
- * Used for development/testing. Replace with Drizzle implementation for production.
- */
-export class InMemoryWorldRepository implements IWorldRepository {
-    private worlds: Map<string, World> = new Map();
-
-    async create(data: Omit<World, 'id' | 'createdAt' | 'updatedAt'>): Promise<World> {
-        const now = new Date();
-        const world: World = {
-            id: uuidv4(),
-            ...data,
-            createdAt: now,
-            updatedAt: now
-        };
-        this.worlds.set(world.id, world);
-        return world;
-    }
-
-    async getById(id: string): Promise<World | null> {
-        return this.worlds.get(id) || null;
-    }
-
-    async getAll(): Promise<World[]> {
-        return Array.from(this.worlds.values());
-    }
-
-    async getByStatus(status: WorldStatus): Promise<World[]> {
-        return Array.from(this.worlds.values()).filter(w => w.status === status);
-    }
-
-    async update(id: string, data: Partial<World>): Promise<World> {
-        const existing = this.worlds.get(id);
-        if (!existing) {
-            throw new Error(`World ${id} not found`);
-        }
-        const updated: World = {
-            ...existing,
-            ...data,
-            updatedAt: new Date()
-        };
-        this.worlds.set(id, updated);
-        return updated;
-    }
-
-    async delete(id: string): Promise<void> {
-        this.worlds.delete(id);
-    }
-}
-
-/**
- * In-Memory Telos Repository
- */
-export class InMemoryWorldTelosRepository implements IWorldTelosRepository {
-    private store: Map<string, WorldTelos> = new Map();
-
-    async get(worldId: string): Promise<WorldTelos | null> {
-        return this.store.get(worldId) || null;
-    }
-
-    async set(worldId: string, content: string): Promise<WorldTelos> {
-        const telos: WorldTelos = {
-            id: uuidv4(),
-            worldId,
-            content,
-            updatedAt: new Date()
-        };
-        this.store.set(worldId, telos);
-        return telos;
-    }
-}
-
-/**
- * In-Memory Config Repository
- */
-export class InMemoryWorldConfigRepository implements IWorldConfigRepository {
-    private store: Map<string, WorldConfig> = new Map();
-
-    async get(worldId: string): Promise<WorldConfig | null> {
-        return this.store.get(worldId) || null;
-    }
-
-    async set(worldId: string, configData: Omit<WorldConfig, 'id' | 'worldId' | 'createdAt' | 'updatedAt'>): Promise<WorldConfig> {
-        const config: WorldConfig = {
-            id: uuidv4(),
-            worldId,
-            ...configData,
-            createdAt: new Date(),
-            updatedAt: new Date()
-        };
-        this.store.set(worldId, config);
-        return config;
-    }
-}
 
 /**
  * WorldService
@@ -128,15 +33,15 @@ export class WorldService {
     private templateService: TemplateService;
 
     constructor(
-        repository?: IWorldRepository,
+        repository: IWorldRepository,
+        telosRepository: IWorldTelosRepository,
+        configRepository: IWorldConfigRepository,
         templateService?: TemplateService,
-        telosRepository?: IWorldTelosRepository,
-        configRepository?: IWorldConfigRepository
     ) {
-        this.repository = repository || new InMemoryWorldRepository();
+        this.repository = repository;
+        this.telosRepository = telosRepository;
+        this.configRepository = configRepository;
         this.templateService = templateService || new TemplateService();
-        this.telosRepository = telosRepository || new InMemoryWorldTelosRepository();
-        this.configRepository = configRepository || new InMemoryWorldConfigRepository();
     }
 
     // ============================================
@@ -148,11 +53,19 @@ export class WorldService {
         const validated = CreateWorldInputSchema.parse(input);
 
         const world = await this.repository.create({
+            id: uuidv4(),
             name: validated.name,
             purpose: validated.purpose,
             status: WorldStatus.DORMANT,
             operatorId: validated.operatorId
         });
+
+        // Initialize empty Telos and Config? 
+        // Or wait for specific actions?
+        // Codex says "Silence by Default". We don't auto-create content unless requested.
+        // But we might want basic record existence.
+
+        // For now, adhere to explicit creation.
 
         this.emitEvent(WorldEvent.CREATED, world.id);
         return world;
@@ -169,7 +82,9 @@ export class WorldService {
         }
 
         // Create World with Template defaults
+        // Create World with Template defaults
         const world = await this.repository.create({
+            id: uuidv4(),
             name: validated.nameOverride || template.name,
             purpose: validated.purposeOverride || template.description,
             status: WorldStatus.DORMANT,
@@ -204,7 +119,9 @@ export class WorldService {
         }
 
         // 3. Create New World
+        // 3. Create New World
         const newWorld = await this.repository.create({
+            id: uuidv4(),
             name: validated.nameOverride || `Copy of ${sourceWorld.name}`,
             purpose: validated.purposeOverride || sourceWorld.purpose,
             status: WorldStatus.DORMANT,
@@ -254,9 +171,20 @@ export class WorldService {
     }
 
     async delete(id: string): Promise<void> {
-        // Soft delete by marking as archived
-        // For hard delete, use repository.delete directly
-        await this.archive(id);
+        // Logic:
+        // 1. Check if active -> Deactivate
+        // 2. Delete Telos -> Repository should handle this or we do it explicitly
+        // 3. Delete Config
+        // 4. Delete World
+
+        if (this.activeWorldId === id) {
+            await this.deactivate(id);
+        }
+
+        await this.telosRepository.delete(id);
+        await this.configRepository.delete(id);
+        await this.repository.delete(id);
+
         this.emitEvent(WorldEvent.DELETED, id);
     }
 
@@ -314,7 +242,7 @@ export class WorldService {
         };
         this.eventLog.push(payload);
         // In real implementation, emit to event bus
-        console.log(`[WorldService] ${event}: ${worldId}`);
+        // console.log(`[WorldService] ${event}: ${worldId}`);
     }
 
     getEventLog(): WorldEventPayload[] {

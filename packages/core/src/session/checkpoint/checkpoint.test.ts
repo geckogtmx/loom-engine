@@ -3,11 +3,15 @@ import { CheckpointService } from './CheckpointService';
 import { CheckpointTrigger } from './types';
 import { L1ActiveLayer, L2EpisodicLayer } from '../../memory/layers';
 
+import { InMemoryCheckpointRepository } from '../test-utils';
+
 describe('CheckpointService', () => {
     let service: CheckpointService;
+    let repo: InMemoryCheckpointRepository;
 
     beforeEach(() => {
-        service = new CheckpointService({ timeIntervalMs: 1000, stepInterval: 2 });
+        repo = new InMemoryCheckpointRepository();
+        service = new CheckpointService(repo, { timeIntervalMs: 1000, stepInterval: 2 });
     });
 
     it('should trigger immediately on MANUAL', () => {

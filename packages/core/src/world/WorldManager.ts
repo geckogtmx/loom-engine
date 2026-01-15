@@ -14,9 +14,9 @@ export class WorldManager {
     private worldId: string;
     private worldService: WorldService;
 
-    constructor(worldId: string, worldService?: WorldService) {
+    constructor(worldId: string, worldService: WorldService) {
         this.worldId = worldId;
-        this.worldService = worldService || new WorldService();
+        this.worldService = worldService;
     }
 
     /**

@@ -4,12 +4,27 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "jsx": "react-jsx",
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ESNext"
+    ],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ],
+      "@loom/core": [
+        "../../packages/core/src"
+      ]
     }
   },
-  "include": ["src"],
-  "references": [{ "path": "../../packages/core" }]
+  "include": [
+    "src"
+  ],
+  "references": [
+    {
+      "path": "../../packages/core"
+    }
+  ]
 }

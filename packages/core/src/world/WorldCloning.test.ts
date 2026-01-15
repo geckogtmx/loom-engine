@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldService, InMemoryWorldRepository, InMemoryWorldTelosRepository, InMemoryWorldConfigRepository } from './WorldService';
+import { WorldService } from './WorldService';
+import { InMemoryWorldRepository, InMemoryWorldTelosRepository, InMemoryWorldConfigRepository } from './test-utils';
 import { WorldStatus, WorldEvent } from './types';
 import { TemplateService } from './TemplateService';
 
@@ -13,9 +14,9 @@ describe('WorldCloning Integration', () => {
         configRepository = new InMemoryWorldConfigRepository();
         worldService = new WorldService(
             new InMemoryWorldRepository(),
-            new TemplateService(), // default mock
             telosRepository,
-            configRepository
+            configRepository,
+            new TemplateService()
         );
     });
 
