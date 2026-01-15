@@ -62,7 +62,9 @@ Workflow: `.github/workflows/test.yml`
 |-------|----------|-----------|---------|
 | Unit | `packages/core/src/**/*.test.ts` | Vitest | Logic, services, utilities |
 | Integration | `packages/core/src/**/*.test.ts` | Vitest | Cross-component flows |
-| E2E | `apps/electron/tests/` (TBD) | Playwright | Full UI flows |
+| E2E | `apps/electron/tests/` | Playwright | Full UI flows |
+
+> **Note:** E2E tests are deferred to **Phase 8** (Operator UI). See `apps/electron/tests/README.md` for setup plan.
 
 ---
 

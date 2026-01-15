@@ -10,30 +10,31 @@
 
 ## Current Status
 **Date:** 2026-01-14
-**Phase:** Phase 2 (Session Lifecycle) - *Complete*
-**Last Model:** Gemini (Claude)
-**Tests:** ✅ 39 passing (6 test files)
+**Phase:** Phase 3 (Worlds System) - *In Progress*
+**Last Model:** Claude
+**Tests:** ✅ 60 passing (7 test files)
 
 ## Latest Handoff Note
 **Context:**
-Phase 1 (Memory/Governance) and Phase 2 (Session Lifecycle) are complete. Full QA tests added.
+Phase 1, Phase 2, and Phase 3 (Tasks 1-3) are complete. Full QA infrastructure in place.
 
 **Accomplished:**
-*   Implemented Memory Layers (L1-L4) with immutability enforcement.
-*   Implemented Governance (A0 Enforcer, META Rules, Write Permissions).
-*   Implemented Session Lifecycle (State Machine, Intent Envelope, Service).
-*   Implemented L2 Checkpointing and Continuity Artifacts.
-*   Implemented Recovery (SessionRecoveryService, FailureHandler).
-*   Created Electron IPC handlers for SessionService.
-*   Added 39 unit tests covering all Phase 1/2 components.
-*   Created `TESTING.md` for QA documentation.
+*   Phase 1: Memory Layers (L1-L4) with immutability enforcement.
+*   Phase 1: Governance (A0 Enforcer, META Rules, Write Permissions).
+*   Phase 2: Session Lifecycle (State Machine, Intent Envelope, Service).
+*   Phase 2: L2 Checkpointing and Continuity Artifacts.
+*   Phase 2: Recovery (SessionRecoveryService, FailureHandler).
+*   Phase 2: Electron IPC handlers for SessionService.
+*   Phase 3: World Schema (worlds, world_config, world_state, world_telos).
+*   Phase 3: WorldService with CRUD, activation, archival.
+*   QA: 60 unit tests, CI pipeline, per-path coverage enforcement.
 
-**Pending / Broken:**
-*   tsconfig warnings about `composite: true` (non-blocking, config cleanup).
+**Pending:**
+*   Phase 3 Tasks 4-8: L4 Telos, WorldManager, L2 Isolation, Templates.
+*   E2E Testing: Deferred to Phase 8 (UI). See `apps/electron/tests/README.md`.
 
 **Next Instruction:**
-*   Start Phase 3: Worlds System.
-*   Create WorldService, WorldManager, and World Templates.
+*   Continue Phase 3: Implement WorldManager and L2 isolation.
 *   Refer to `LOOM_DEVELOPMENT_PLAN.md` Section 5.4.
 
 ---
@@ -41,5 +42,6 @@ Phase 1 (Memory/Governance) and Phase 2 (Session Lifecycle) are complete. Full Q
 ## History Log
 *(Newest First)*
 
+*   **2026-01-14 (Claude):** Phase 3 (1-3), CI, coverage enforcement, E2E deferral docs.
 *   **2026-01-14 (Claude):** Completed Phase 2. Added QA tests. Created TESTING.md.
 *   **2026-01-14 (Gemini):** Created Governance Files. Ready for scaffolding.
