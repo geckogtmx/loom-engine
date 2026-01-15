@@ -1,0 +1,1 @@
+ALTER TABLE `pattern_steps` ADD `system_prompt` text NOT NULL;

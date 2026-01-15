@@ -15,7 +15,9 @@ describe('Core Pattern Definitions', () => {
         'Fact Check.md',
         'Metaphor Bloom.md',
         'Narrative Spine.md',
-        'Framework Forge.md'
+        'Framework Forge.md',
+        'Decision Diamond.md',
+        'Possibility Engine.md'
     ];
 
     it('should parse all core patterns successfully', async () => {

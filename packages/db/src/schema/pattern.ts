@@ -40,6 +40,7 @@ export const patternSteps = sqliteTable('pattern_steps', {
     description: text('description').notNull(),
 
     agentRole: text('agent_role'), // Recommended role
+    systemPrompt: text('system_prompt').notNull(), // The actual prompts/instructions
 
     // JSON configs
     tempoMode: text('tempo_mode'), // 'allegro', 'andante', 'adagio'

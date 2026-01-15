@@ -11,34 +11,37 @@
 
 ## Current Status
 **Date:** 2026-01-14
-**Phase:** Phase 5 (Pattern System) - *Core Content & Logic Complete (80%)*
+**Phase:** Phase 5 (Pattern System) - *Persistence & Content (85%)*
 **Last Model:** Gemini
 **Tests:** ✅ 88 passing (Packages/Core) | Coverage: TBD
 
 ## Latest Handoff Note
 
 **Context:**
-Phase 5 is nearing completion.
-We have the Runtime (Lifecycle, Runner, Abort, Registry) and now **5 Core Patterns** defined and verified.
-We also started Phase 6 Research with a `SpineGenerator` prototype.
-All 88 tests are passing, including pattern definition checks.
+Phase 5 is nearly complete.
+We have:
+1.  **Runtime:** Lifecycle, Runner, Abort, Registry.
+2.  **Persistence:** `DrizzlePatternRepository` implemented to sync Markdown patterns to SQLite.
+3.  **Content:** 7 Core Patterns (Option Burst, Fact Check, Metaphor Bloom, Narrative Spine, Framework Forge, Decision Diamond, Possibility Engine).
+4.  **Research:** `SpineGenerator` prototype.
 
 **Accomplished This Session:**
-*   ✅ **Core Patterns:** Created `Metaphor Bloom`, `Narrative Spine`, `Framework Forge`.
-*   ✅ **Testing:** Validated all 5 Markdown patterns with `PatternDefinitions.test.ts`.
-*   ✅ **Phase 6 Research:** Created `SpineGenerator.ts` prototype (heuristic dispatcher).
-*   ✅ **Repository:** Added `getByName` helper to Registry (Fixed type errors in dispatcher).
-*   ✅ **Testing:** 88/88 tests passing.
+*   ✅ **Persistence:** Implemented `DrizzlePatternRepository` with `sync` logic (Upsert by Name).
+*   ✅ **Schema:** Updated `patternSteps` table to include `system_prompt` and ran schema generation.
+*   ✅ **Core Patterns:** Created `Decision Diamond` and `Possibility Engine`.
+*   ✅ **Verification:** Validated all 7 patterns in `PatternDefinitions.test.ts`.
+*   ✅ **Documentation:** Updated `LOOM_DEVELOPMENT_PLAN.md` to reflect Phase 5 progress.
 
 **Pending (Phase 5 Tasks):**
-*   **Remaining 9 Core Patterns:** (See `AI_CODEX.md` for full list).
-*   **Database Sync:** We need to ensure `PatternRegistry.loadFromL3` actually syncs these MD files to the DB. (Currently just parses).
+*   **Remaining 7 Core Patterns:** (See `AI_CODEX.md` or Task List).
+*   **Integration:** `apps/electron` needs to instantiate `DrizzlePatternRepository` and pass it to `PatternRegistry` during startup to actually trigger the sync.
+*   **Dependency Build:** `packages/db` might need a build to resolve lint errors in `DrizzlePatternRepository`.
 
 **Next Instruction:**
 ```
 1. Run: cd packages/core && npx vitest run
-2. Implement: `PatternRepository.sync(pattern)` to save parsed patterns to SQLite `patterns` table.
-3. Implement: The remaining Core Patterns (batches of 3-4).
+2. Implement: The remaining 7 Core Patterns (Batch 2/3/4/5).
+3. Connect: Instantiate `DrizzlePatternRepository` in `apps/electron` and verify sync works.
 4. Refine: `SpineGenerator` to integration with `SessionIntentEnvelope`.
 ```
 
@@ -48,17 +51,17 @@ All 88 tests are passing, including pattern definition checks.
 
 | File | Purpose |
 |------|---------|
-| `knowledge/03_Entities/Patterns/*.md` | Core Pattern Definitions |
-| `packages/core/src/pattern/PatternDefinitions.test.ts` | Verification for MD files |
-| `packages/core/src/dispatcher/SpineGenerator.ts` | Phase 6 Prototype |
-| `packages/core/src/pattern/PatternRegistry.ts` | Added search by name |
+| `packages/core/src/pattern/DrizzlePatternRepository.ts` | DB Sync Logic |
+| `packages/db/src/schema/pattern.ts` | Added system_prompt column |
+| `knowledge/03_Entities/Patterns/*.md` | New Patterns |
+| `LOOM_DEVELOPMENT_PLAN.md` | Roadmap Update |
 
 ---
 
 ## History Log
 *(Newest First)*
 
+*   **2026-01-14 (Gemini):** Phase 5 Persistence & 7 Core Patterns. 88 Tests.
 *   **2026-01-14 (Gemini):** Phase 5 Core Patterns (5 total), SpineGenerator. 88 Tests.
 *   **2026-01-14 (Gemini):** Phase 5 Robustness (Abort, Parser, Fact Check). 87 Tests.
 *   **2026-01-14 (Gemini):** Phase 5 Execution Engine. Lifecycle, StepRunner, Option Burst. 82 Tests.
-*   **2026-01-14 (Gemini):** Phase 5 Started. Schema, Registry, Primacy, Tempo. 81 Tests.
