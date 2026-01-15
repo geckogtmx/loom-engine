@@ -34,12 +34,12 @@ describe('L3KnowledgeLayer', () => {
 
 describe('L2EpisodicLayer', () => {
     it('should allow write (append-only)', async () => {
-        const l2 = new L2EpisodicLayer();
+        const l2 = new L2EpisodicLayer('test-world');
         await expect(l2.write('log-entry', { event: 'test' })).resolves.toBeUndefined();
     });
 
     it('should allow clear (archival)', async () => {
-        const l2 = new L2EpisodicLayer();
+        const l2 = new L2EpisodicLayer('test-world');
         await expect(l2.clear()).resolves.toBeUndefined();
     });
 });

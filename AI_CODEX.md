@@ -41,6 +41,7 @@ We operate in a Multi-Model environment. You do not share context with the next 
 *   **Style:** Functional over Class-based (except for Core Services).
 *   **Naming:** `PascalCase` for Components/Classes, `camelCase` for functions/vars, `snake_case` for DB columns.
 *   **Testing:** Vitest for Logic, Playwright for E2E. **See `TESTING.md` for full QA guide.**
+*   **Security:** All code must comply with `SECURITY.md` (Electron hardening, IPC validation, secrets handling).
 *   **Error Handling:** Never swallow errors. Fail loudly or degrade gracefully to "Offline Mode".
 
 ## 4.1 QA Mandate

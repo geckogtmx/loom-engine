@@ -103,3 +103,59 @@ export interface IWorldRepository {
     update(id: string, data: Partial<World>): Promise<World>;
     delete(id: string): Promise<void>;
 }
+
+// ============================================
+// TEMPLATE INTERFACES
+// ============================================
+
+export interface WorldTemplate {
+    id: string;
+    name: string;
+    description: string;
+    telos: string;
+    config: Record<string, any>;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+export const CreateFromTemplateInputSchema = z.object({
+    templateId: z.string().uuid(),
+    nameOverride: z.string().min(1).max(100).optional(),
+    purposeOverride: z.string().min(1).max(500).optional(),
+    operatorId: z.string().optional()
+});
+
+export type CreateFromTemplateInput = z.infer<typeof CreateFromTemplateInputSchema>;
+
+export interface ITemplateRepository {
+    create(template: Omit<WorldTemplate, 'id' | 'createdAt' | 'updatedAt'>): Promise<WorldTemplate>;
+    getById(id: string): Promise<WorldTemplate | null>;
+    getAll(): Promise<WorldTemplate[]>;
+}
+
+// ============================================
+// CLONING TYPES
+// ============================================
+
+export const CloneWorldInputSchema = z.object({
+    sourceWorldId: z.string().uuid(),
+    nameOverride: z.string().min(1).max(100).optional(),
+    purposeOverride: z.string().min(1).max(500).optional(),
+    operatorId: z.string().optional()
+});
+
+export type CloneWorldInput = z.infer<typeof CloneWorldInputSchema>;
+
+// ============================================
+// TELOS & CONFIG REPOSITORIES
+// ============================================
+
+export interface IWorldTelosRepository {
+    get(worldId: string): Promise<WorldTelos | null>;
+    set(worldId: string, content: string): Promise<WorldTelos>;
+}
+
+export interface IWorldConfigRepository {
+    get(worldId: string): Promise<WorldConfig | null>;
+    set(worldId: string, config: Omit<WorldConfig, 'id' | 'worldId' | 'createdAt' | 'updatedAt'>): Promise<WorldConfig>;
+}

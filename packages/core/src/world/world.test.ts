@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { WorldService, InMemoryWorldRepository } from './WorldService';
 import { WorldStatus, WorldEvent, CreateWorldInputSchema } from './types';
+import { TemplateService } from './TemplateService';
 
 describe('WorldStatus Enum', () => {
     it('should have correct values', () => {
@@ -62,6 +63,49 @@ describe('WorldService', () => {
             const events = service.getEventLog();
             expect(events.length).toBe(1);
             expect(events[0].event).toBe(WorldEvent.CREATED);
+        });
+    });
+
+    describe('createFromTemplate()', () => {
+        it('should create a World from a template', async () => {
+            // Seed defaults first
+            const templateService = new TemplateService();
+            await new Promise(resolve => setTimeout(resolve, 50)); // Wait for seed
+            const templates = await templateService.getAll();
+            const podcastTemplate = templates.find(t => t.name.includes('Podcast'));
+
+            if (!podcastTemplate) throw new Error('Podcast template not seeded');
+
+            // Inject TemplateService
+            const serviceWithTemplate = new WorldService(undefined, templateService);
+
+            const world = await serviceWithTemplate.createFromTemplate({
+                templateId: podcastTemplate.id,
+                nameOverride: 'My Podcast',
+                operatorId: 'op-1'
+            });
+
+            expect(world.name).toBe('My Podcast'); // Overridden
+            expect(world.purpose).toBe(podcastTemplate.description); // Inherited
+            expect(world.status).toBe(WorldStatus.DORMANT);
+
+            const events = serviceWithTemplate.getEventLog();
+            expect(events[0].data?.fromTemplate).toBe(podcastTemplate.id);
+        });
+
+        it('should throw if template not found', async () => {
+            // Mock TemplateService that returns null
+            const mockTemplateService = {
+                getById: async () => null,
+                getAll: async () => []
+            } as any;
+
+            const serviceWithTemplate = new WorldService(undefined, mockTemplateService);
+
+            const missingId = '00000000-0000-0000-0000-000000000000';
+            await expect(serviceWithTemplate.createFromTemplate({
+                templateId: missingId
+            })).rejects.toThrow(`Template ${missingId} not found`);
         });
     });
 

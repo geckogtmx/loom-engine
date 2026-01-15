@@ -76,3 +76,21 @@ export const world_telos = sqliteTable('world_telos', {
     content: text('content').notNull(), // Markdown or structured identity
     updated_at: integer('updated_at', { mode: 'timestamp' }).notNull(),
 });
+
+// ============================================
+// WORLD_TEMPLATES - Reusable World Definitions
+// ============================================
+export const world_templates = sqliteTable('world_templates', {
+    id: text('id').primaryKey(),
+    name: text('name').notNull(),
+    description: text('description').notNull(),
+
+    // Default Identity (to be copied to world_telos)
+    telos: text('telos').notNull(),
+
+    // Default Configuration (to be copied to world_config)
+    config: text('config').notNull(), // JSON string: { allowed_agents: [], allowed_patterns: [], ... }
+
+    created_at: integer('created_at', { mode: 'timestamp' }).notNull(),
+    updated_at: integer('updated_at', { mode: 'timestamp' }).notNull(),
+});

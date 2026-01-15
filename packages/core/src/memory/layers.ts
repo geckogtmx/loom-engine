@@ -40,17 +40,24 @@ export class L3KnowledgeLayer implements IMemoryLayer {
 export class L2EpisodicLayer implements IMemoryLayer {
     id = 'L2';
     name = 'Episodic History';
+    private worldId: string;
+
+    constructor(worldId: string) {
+        this.worldId = worldId;
+    }
 
     async read(key: string): Promise<any> {
-        return null;
+        console.log(`[L2:${this.worldId}] Reading ${key}`);
+        return null; // Placeholder
     }
 
     async write(key: string, value: any): Promise<void> {
-        console.log('L2 append:', key);
+        console.log(`[L2:${this.worldId}] Writing ${key}`, value);
     }
 
     async clear(): Promise<void> {
         // Only cleared on specific archival events
+        console.log(`[L2:${this.worldId}] Clear requested (ignored safely)`);
     }
 }
 

@@ -17,9 +17,8 @@ export class SessionService {
         this.envelope = new SessionIntentEnvelopeImpl(worldId);
 
         // Initialize memory layers
-        // In a real app, these might be injected or retrieved from a factory
         this.l1 = new L1ActiveLayer();
-        this.l2 = new L2EpisodicLayer();
+        this.l2 = new L2EpisodicLayer(worldId);
         this.l3 = new L3KnowledgeLayer();
 
         this.startTime = new Date();

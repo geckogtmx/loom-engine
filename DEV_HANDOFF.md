@@ -20,23 +20,24 @@
 Phase 1-2 complete. Phase 3 partially complete (Schema, Types, WorldService done). Full QA infrastructure with CI and per-path coverage enforcement.
 
 **Accomplished This Session:**
-*   ✅ Phase 1: Memory Layers (L1-L4), Governance (A0, META, Permissions)
-*   ✅ Phase 2: Session Lifecycle, Checkpointing, Continuity, Recovery, IPC
-*   ✅ Phase 3 (Tasks 1-3): World Schema, Types, WorldService with tests
-*   ✅ QA: 60 unit tests, GitHub Actions CI, per-path coverage enforcement
-*   ✅ E2E testing deferred to Phase 8 with documentation
+*   ✅ **Security:** Updated `SECURITY.md` (WebSocket, RateLimits, Audit)
+**Accomplished This Session:**
+*   ✅ **Phase 3:** Implemented World Cloning & Templates (Complete)
+*   ✅ **Phase 4:** Implemented Agent Schema (Profiles, Telos, Modes)
+*   ✅ **Phase 4:** Implemented Agent Profile Loader (Markdown Parser)
+*   ✅ **Phase 4:** Implemented Agent Runtime (Context, Models, Escalation)
+*   ✅ **Phase 4:** Implemented Constraint Binding (World Config -> Prompt)
+*   ✅ **Testing:** 68/68 tests passing (Full Suite)
 
-**Pending (Phase 3 Tasks 4-8):**
-*   L4 Telos writing with META approval
-*   WorldManager runtime controller
-*   L2 isolation (World-scoped queries)
-*   World Template schema and "Create from Template" flow
+**Pending (Phase 5 Tasks - Patterns):**
+*   Pattern Schema (Structure, IO)
+*   Pattern Registry Service
 
 **Next Instruction:**
 ```
 1. Run: cd packages/core && npx vitest run
-2. Read: LOOM_DEVELOPMENT_PLAN.md Section 5.4
-3. Implement: WorldManager and L2 isolation
+2. Read: LOOM_DEVELOPMENT_PLAN.md Section 5.6 (Phase 5 Pattern System)
+3. Implement: Pattern Schema (Task 20)
 ```
 
 ---
@@ -53,6 +54,7 @@ Phase 1-2 complete. Phase 3 partially complete (Schema, Types, WorldService done
 | `.github/workflows/test.yml` | CI pipeline |
 | `scripts/check-coverage.js` | Per-path coverage enforcement |
 | `TESTING.md` | QA guide with thresholds |
+| `SECURITY.md` | Security guidelines (Electron, IPC, secrets) |
 
 ---
 

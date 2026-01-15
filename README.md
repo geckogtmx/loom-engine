@@ -71,4 +71,6 @@ pnpm dev
 
 *   **`AI_CODEX.md`**: The Constitution & Technical Standards.
 *   **`LOOM_DEVELOPMENT_PLAN.md`**: The Master Roadmap.
+*   **`TESTING.md`**: QA Guide with test conventions and coverage thresholds.
+*   **`SECURITY.md`**: Security Guidelines (Electron hardening, IPC validation, secrets).
 *   **`knowledge/`**: The detailed concept and architectural documentation.
