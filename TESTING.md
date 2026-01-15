@@ -11,9 +11,46 @@
 cd packages/core
 npx vitest run
 
+# Run tests with coverage
+pnpm test:coverage
+
 # Run tests in watch mode (development)
 pnpm test
 ```
+
+---
+
+## Coverage Thresholds
+
+Coverage is enforced via CI. Builds fail if thresholds aren't met.
+
+### Global Thresholds
+| Metric | Threshold |
+|--------|-----------|
+| Lines | 70% |
+| Branches | 60% |
+| Functions | 75% |
+| Statements | 70% |
+
+### Critical Path Overrides
+| Path | Lines | Functions |
+|------|-------|-----------|
+| `src/governance/**` | 90% | 90% |
+| `src/memory/**` | 90% | 90% |
+
+> **Rationale:** Governance and memory are integrity-critical. Bugs there aren't UI glitches — they're data corruption.
+
+---
+
+## CI Pipeline
+
+Tests run automatically on:
+- ✅ Every push to `main`
+- ✅ Every pull request to `main`
+
+**Failure blocks merge.**
+
+Workflow: `.github/workflows/test.yml`
 
 ---
 
@@ -27,7 +64,7 @@ pnpm test
 
 ---
 
-## Current Coverage (Phase 1 + Phase 2)
+## Current Coverage (Phase 1 + 2 + 3)
 
 ### Memory Layer (`src/memory/`)
 | Test File | Tests | Coverage |
@@ -47,7 +84,12 @@ pnpm test
 | `continuity/continuity.test.ts` | 5 | Artifact generation, parsing, resumption |
 | `recovery/recovery.test.ts` | 6 | Retry, backoff, exhaustion, logging |
 
-**Total: 39 tests**
+### Worlds (`src/world/`)
+| Test File | Tests | Coverage |
+|-----------|-------|----------|
+| `world.test.ts` | 21 | CRUD, activation, archival, validation |
+
+**Total: 60 tests**
 
 ---
 
@@ -79,21 +121,11 @@ describe('MyService', () => {
 
 ---
 
-## CI Integration (TBD)
-
-Tests will run automatically on:
-- Pull Request creation
-- Push to `main`
-
-Failure blocks merge.
-
----
-
 ## Adding Tests for New Features
 
 1. Create `<feature>.test.ts` in the same directory as the source.
 2. Cover: happy path, edge cases, error conditions.
-3. Run `npx vitest run` to verify.
+3. Run `pnpm test:coverage` to verify thresholds.
 4. Commit with message: `test(<scope>): <description>`
 
 ---
