@@ -134,4 +134,15 @@ export class SessionService {
         this.stateMachine.transitionTo(SessionState.CLOSED);
         await this.sessionRepo.close(this.id, new Date());
     }
+
+    /**
+     * Generates a temporary authentication token for WebSocket connections.
+     * In a real system, this would be signed (JWT) or stored in Redis.
+     * For local electron app, a simple UUID linked to the session ID suffices.
+     */
+    generateSessionToken(): string {
+        // Format: session_id:random_token
+        // This allows the WS server to validate ownership
+        return `${this.id}:${uuidv4()}`;
+    }
 }

@@ -35,6 +35,16 @@ We operate in a Multi-Model environment. You do not share context with the next 
     *   What is broken/pending.
     *   The specific instruction for the next model.
 
+## 3.1 The "Task Anchor" Protocol (CRITICAL)
+
+**Every** session MUST be anchored by a `task.md` artifact.
+
+1.  **Creation:** Create a `task.md` with a **10-20 item checklist**.
+    *   **Scope:** Do NOT limit to immediate "next steps." Plan a substantial chunk of work (e.g., an entire Phase or major Feature).
+    *   **Granularity:** Items should be concrete and checkable (e.g., "Implement X class", "Run test Y").
+2.  **Execution:** Update `task.md` at logical task boundaries. Do not update it for every single file edit.
+3.  **Continuity:** The `task.md` list drives your execution. If you finish, expand the list. Never run out of tasks.
+
 ## 4. Coding Standards
 
 *   **Language:** TypeScript (Strict).

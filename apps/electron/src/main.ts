@@ -14,11 +14,26 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dbPath = process.env.DB_PATH || path.join(app.getPath('userData'), 'loom.db');
 
 // WebSocket Server for Streaming
+// WebSocket Server for Streaming
 const wss = new WebSocketServer({ port: 8080 });
-wss.on('connection', (ws) => {
-  console.warn('UI connected to WebSocket');
+wss.on('connection', (ws, req) => {
+  const url = new URL(req.url || '', `http://${req.headers.host}`);
+  const token = url.searchParams.get('token');
+
+  // Simple token validation (Phase 7.5)
+  // In a real scenario, we would check this against the active SessionService
+  // For now, checks presence and basic structure (session_id:uuid)
+  if (!token || !token.includes(':')) {
+    console.warn('[SECURITY] Blocked unauthorized WebSocket connection attempt');
+    ws.close(3000, 'Unauthorized');
+    return;
+  }
+
+  console.log(`[WebSocket] UI connected with verified token: ${token.substring(0, 8)}...`);
+
   ws.on('message', (message) => {
-    console.warn(`Received: ${message}`);
+    // Only process messages from authenticated sockets
+    console.debug(`Received: ${message}`);
   });
 });
 

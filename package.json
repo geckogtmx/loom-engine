@@ -21,5 +21,11 @@
   "dependencies": {
     "chokidar": "^5.0.0",
     "ws": "^8.19.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "esbuild@<=0.24.2": ">=0.25.0",
+      "electron@<35.7.5": ">=35.7.5"
+    }
   }
 }
