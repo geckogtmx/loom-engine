@@ -32,11 +32,13 @@ Coverage is enforced via CI. Builds fail if thresholds aren't met.
 | Functions | 75% |
 | Statements | 70% |
 
-### Critical Path Overrides
+### Critical Path Overrides (Custom Enforcement)
 | Path | Lines | Functions |
 |------|-------|-----------|
 | `src/governance/**` | 90% | 90% |
 | `src/memory/**` | 90% | 90% |
+
+> **Implementation:** `scripts/check-coverage.js` parses `coverage-summary.json` and enforces per-path thresholds. Runs automatically in CI after coverage generation.
 
 > **Rationale:** Governance and memory are integrity-critical. Bugs there aren't UI glitches — they're data corruption.
 
