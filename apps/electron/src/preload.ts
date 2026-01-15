@@ -11,6 +11,7 @@ contextBridge.exposeInMainWorld('api', {
   },
   session: {
     create: (worldId: string) => ipcRenderer.invoke(SessionChannels.CREATE, worldId),
+    list: (worldId: string) => ipcRenderer.invoke(SessionChannels.LIST, worldId),
     initialize: (sessionId: string) => ipcRenderer.invoke(SessionChannels.INITIALIZE, sessionId),
     setIntent: (sessionId: string, goal: string, audience: string, constraints: string[]) =>
       ipcRenderer.invoke(SessionChannels.SET_INTENT, sessionId, goal, audience, constraints),

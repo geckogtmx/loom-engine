@@ -4,6 +4,7 @@
 export const SessionChannels = {
     // Session Lifecycle
     CREATE: 'session:create',
+    LIST: 'session:list',
     INITIALIZE: 'session:initialize',
     SET_INTENT: 'session:set-intent',
     START: 'session:start',

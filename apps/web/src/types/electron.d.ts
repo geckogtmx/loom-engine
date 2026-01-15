@@ -10,9 +10,10 @@ export interface WorldApi {
 
 export interface SessionApi {
     create: (worldId: string) => Promise<any>;
+    list: (worldId: string) => Promise<any[]>;
     initialize: (sessionId: string) => Promise<void>;
     setIntent: (sessionId: string, goal: string, audience: string, constraints: string[]) => Promise<any>;
-    start: (sessionId: string) => Promise<void>;
+    start: (sessionId: string) => Promise<any>;
     end: (sessionId: string) => Promise<void>;
     getState: (sessionId: string) => Promise<any>;
     detectIncomplete: () => Promise<any[]>;

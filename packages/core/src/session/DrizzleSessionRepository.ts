@@ -54,6 +54,13 @@ export class DrizzleSessionRepository implements ISessionRepository {
             .where(eq(sessions.id, id));
     }
 
+    async list(worldId: string): Promise<SessionData[]> {
+        const results = await this.db.select().from(sessions)
+            .where(eq(sessions.world_id, worldId));
+
+        return results.map(this.mapToSessionData);
+    }
+
     async listActive(worldId: string): Promise<SessionData[]> {
         // Not closed
         // In SQL: status != 'CLOSED' or closed_at IS NULL

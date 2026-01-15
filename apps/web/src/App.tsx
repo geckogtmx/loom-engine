@@ -1,58 +1,86 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Layout } from './components/Layout';
 import { useWorldStore } from './store/useWorldStore';
+import { useSessionStore } from './store/useSessionStore';
+import { SessionsView } from './components/SessionsView';
+import { SessionRunner } from './components/SessionRunner';
 import { Globe, Activity, FileText } from 'lucide-react';
+
+type View = 'DASHBOARD' | 'SESSIONS' | 'RUNNER';
 
 function App() {
     const { activeWorld } = useWorldStore();
+    const { activeSession } = useSessionStore();
+    const [view, setView] = useState<View>('DASHBOARD');
+
+    // Reset view when world changes
+    useEffect(() => {
+        setView('DASHBOARD');
+    }, [activeWorld?.id]);
+
+    // Navigate to Runner when session is selected
+    useEffect(() => {
+        if (activeSession) {
+            setView('RUNNER');
+        }
+    }, [activeSession]);
 
     return (
         <Layout>
             <div className="h-full flex flex-col p-8">
                 {activeWorld ? (
-                    <div className="max-w-4xl mx-auto w-full space-y-8">
-                        {/* Header */}
-                        <div>
-                            <div className="flex items-center gap-3 mb-2">
-                                <span className="px-2 py-1 bg-indigo-500/10 text-indigo-400 text-xs rounded border border-indigo-500/20 uppercase font-bold tracking-wider">
-                                    {activeWorld.status}
-                                </span>
-                                <span className="text-slate-500 text-sm font-mono">{activeWorld.id}</span>
+                    view === 'RUNNER' ? (
+                        <SessionRunner onBack={() => setView('SESSIONS')} />
+                    ) : view === 'SESSIONS' ? (
+                        <SessionsView onBack={() => setView('DASHBOARD')} />
+                    ) : (
+                        <div className="max-w-4xl mx-auto w-full space-y-8 animate-in fade-in duration-500">
+                            {/* Header */}
+                            <div>
+                                <div className="flex items-center gap-3 mb-2">
+                                    <span className="px-2 py-1 bg-indigo-500/10 text-indigo-400 text-xs rounded border border-indigo-500/20 uppercase font-bold tracking-wider">
+                                        {activeWorld.status}
+                                    </span>
+                                    <span className="text-slate-500 text-sm font-mono">{activeWorld.id}</span>
+                                </div>
+                                <h1 className="text-4xl font-extrabold text-white tracking-tight">{activeWorld.name}</h1>
+                                <p className="mt-2 text-lg text-slate-400 leading-relaxed max-w-2xl">
+                                    {activeWorld.purpose}
+                                </p>
                             </div>
-                            <h1 className="text-4xl font-extrabold text-white tracking-tight">{activeWorld.name}</h1>
-                            <p className="mt-2 text-lg text-slate-400 leading-relaxed max-w-2xl">
-                                {activeWorld.purpose}
-                            </p>
+
+                            {/* Dashboard Grid */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div
+                                    onClick={() => setView('SESSIONS')}
+                                    className="bg-slate-900/50 border border-slate-800 p-6 rounded-xl hover:bg-slate-900 hover:border-indigo-500/50 transition-all cursor-pointer group"
+                                >
+                                    <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-400 mb-4 group-hover:bg-blue-500/20 group-hover:scale-110 transition-all">
+                                        <Activity size={20} />
+                                    </div>
+                                    <h3 className="font-semibold text-slate-200 mb-1 group-hover:text-white">Sessions</h3>
+                                    <p className="text-sm text-slate-500 group-hover:text-slate-400">Manage and run active sessions in this world.</p>
+                                </div>
+
+                                <div className="bg-slate-900/50 border border-slate-800 p-6 rounded-xl hover:bg-slate-900 hover:border-emerald-500/50 transition-all cursor-pointer group">
+                                    <div className="w-10 h-10 bg-emerald-500/10 rounded-lg flex items-center justify-center text-emerald-400 mb-4 group-hover:bg-emerald-500/20 group-hover:scale-110 transition-all">
+                                        <FileText size={20} />
+                                    </div>
+                                    <h3 className="font-semibold text-slate-200 mb-1 group-hover:text-white">Telos & Config</h3>
+                                    <p className="text-sm text-slate-500 group-hover:text-slate-400">Edit the foundational definition and rules.</p>
+                                </div>
+
+                                <div className="bg-slate-900/50 border border-slate-800 p-6 rounded-xl hover:bg-slate-900 hover:border-purple-500/50 transition-all cursor-pointer group">
+                                    <div className="w-10 h-10 bg-purple-500/10 rounded-lg flex items-center justify-center text-purple-400 mb-4 group-hover:bg-purple-500/20 group-hover:scale-110 transition-all">
+                                        <Globe size={20} />
+                                    </div>
+                                    <h3 className="font-semibold text-slate-200 mb-1 group-hover:text-white">Knowledge Graph</h3>
+                                    <p className="text-sm text-slate-500 group-hover:text-slate-400">Explore the L3 persistent memory structures.</p>
+                                </div>
+                            </div>
+
                         </div>
-
-                        {/* Dashboard Grid */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div className="bg-slate-900/50 border border-slate-800 p-6 rounded-xl hover:bg-slate-900 transition-colors cursor-pointer group">
-                                <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-400 mb-4 group-hover:bg-blue-500/20">
-                                    <Activity size={20} />
-                                </div>
-                                <h3 className="font-semibold text-slate-200 mb-1">Sessions</h3>
-                                <p className="text-sm text-slate-500">Manage and run active sessions in this world.</p>
-                            </div>
-
-                            <div className="bg-slate-900/50 border border-slate-800 p-6 rounded-xl hover:bg-slate-900 transition-colors cursor-pointer group">
-                                <div className="w-10 h-10 bg-emerald-500/10 rounded-lg flex items-center justify-center text-emerald-400 mb-4 group-hover:bg-emerald-500/20">
-                                    <FileText size={20} />
-                                </div>
-                                <h3 className="font-semibold text-slate-200 mb-1">Telos & Config</h3>
-                                <p className="text-sm text-slate-500">Edit the foundational definition and rules.</p>
-                            </div>
-
-                            <div className="bg-slate-900/50 border border-slate-800 p-6 rounded-xl hover:bg-slate-900 transition-colors cursor-pointer group">
-                                <div className="w-10 h-10 bg-purple-500/10 rounded-lg flex items-center justify-center text-purple-400 mb-4 group-hover:bg-purple-500/20">
-                                    <Globe size={20} />
-                                </div>
-                                <h3 className="font-semibold text-slate-200 mb-1">Knowledge Graph</h3>
-                                <p className="text-sm text-slate-500">Explore the L3 persistent memory structures.</p>
-                            </div>
-                        </div>
-
-                    </div>
+                    )
                 ) : (
                     <div className="h-full flex flex-col items-center justify-center text-center opacity-0 animate-in fade-in duration-700">
                         <div className="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center mb-4 ring-1 ring-slate-700">

@@ -30,8 +30,8 @@ describe('CheckpointService', () => {
         service.incrementStep();
 
         // Mock layers
-        const l1 = new L1ActiveLayer();
-        const l2 = new L2EpisodicLayer();
+        const l1 = new L1ActiveLayer() as any;
+        const l2 = new L2EpisodicLayer({} as any) as any;
 
         await service.createCheckpoint('sess-1', CheckpointTrigger.STEP_COUNT, 'ACTIVE', l1, l2);
 

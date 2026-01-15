@@ -15,6 +15,7 @@ export interface ISessionRepository {
     updateStatus(id: string, status: SessionState): Promise<void>;
     updateEnvelope(id: string, envelope: any): Promise<void>;
     close(id: string, closedAt: Date): Promise<void>;
+    list(worldId: string): Promise<SessionData[]>;
     listActive(worldId: string): Promise<SessionData[]>;
     listIncomplete(): Promise<SessionData[]>;
 }

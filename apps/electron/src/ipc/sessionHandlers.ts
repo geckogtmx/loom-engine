@@ -45,6 +45,11 @@ export function registerSessionHandlers(dbPath: string): void {
         };
     });
 
+    // List sessions for a world
+    ipcMain.handle(SessionChannels.LIST, async (event: IpcMainInvokeEvent, worldId: string) => {
+        return await sessionRepo.list(worldId);
+    });
+
     // Initialize/Load existing session (Resume)
     // We need a way to load a specific session ID into memory if it's not there
     ipcMain.handle(SessionChannels.INITIALIZE, async (event: IpcMainInvokeEvent, sessionId: string) => {

@@ -17,28 +17,28 @@
 *   **Phase 1 (Core)**: ✅ Complete
 *   **Phase 2 (Sessions)**: ✅ Complete (Full Persistence)
 *   **Phase 3 (Worlds)**: ✅ Complete
-*   **Phase 3.5 (Frontend)**: ✅ Code Complete (Needs Manual Verification)
+*   **Phase 3.5 (Frontend)**: ✅ Complete
+*   **Phase 3.6 (Session Runner)**: ✅ Complete (UI & Mock Streaming)
+*   **Phase 7 (AI Integration)**: ⏳ Pending
 
 ## Immediate Next Instruction
 > **For the next session:**
-> 1.  **LAUNCH THE APP**: Run `pnpm run dev` in `apps/electron`.
-> 2.  **VERIFY UI**:
->     *   Create a World ("Test World").
->     *   Appears in Sidebar?
->     *   Persists after restart?
-> 3.  **SESSION RUNNER**: Begin implementing the "Sessions" card in the Dashboard.
->     *   Clicking "Sessions" should show a list of sessions for the active world.
->     *   "New Session" button should invoke `api.session.create`.
+> 1.  **CONNECT REAL AI**: In Phase 7, you need to replace the `setTimeout` mock in `SessionRunner.tsx` with real calls to `Ollama` (or other providers).
+> 2.  **WEBSOCKETS**: Implement the backend `WebSocketServer` (already scaffolded in Phase 0?) to stream tokens to the frontend.
+> 3.  **CONNECT IPC**: Ensure `api.session.chat(sessionId, message)` calls the backend, which then pushes to the stream.
 
 ## Known Issues / Debts
-*   The "Sessions", "Telos & Config", "Knowledge Graph" cards in `App.tsx` are currently purely visual (onClick does nothing). They need routing/views.
-*   `SessionRecoveryService.detectIncompleteSessions` uses a simple list scan.
+*   `SessionRunner` currently simulates AI responses with `setTimeout`.
+*   `SessionService` needs a `chat()` method to handle input, append to L2, and trigger LLM generation.
+*   Check `apps/electron/src/server/WebSocketServer.ts` (if exists) or create it.
 
 ---
 
 ## Session Log (Last 3 Sessions)
 
 ### 2026-01-15 - Gemini (Antigravity)
-- **Phase 2 Remediation**: Implemented `DrizzleSessionRepository`, `DrizzleCheckpointRepository`, `session_checkpoints` table. Fixed `SessionService` to use DI.
-- **QA Fixes**: Fixed `checkpoint.test.ts` and `WorldCloning.test.ts` mock failures. 115/115 tests passing.
-- **Phase 3.5 Frontend**: Scaffolded `apps/web`. Built `WorldSelector`, `CreateWorldModal`, `useWorldStore`. Updated `electron.d.ts`.
+- **Feature**: Implemented `SessionRunner` UI with Primacy (Intent Setting) and Active (Chat) states.
+- **Frontend**: Added navigation between Dashboard, Session List, and Runner in `App.tsx`.
+- **State**: Updated `useSessionStore` to handle `setIntent` and `startSession`.
+- **QA**: Verified Frontend build (`pnpm build` passed).
+- **Core**: Enforced `PRIMACY` check in UI before allowing chat.

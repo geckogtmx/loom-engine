@@ -44,6 +44,11 @@ export class InMemorySessionRepository implements ISessionRepository {
             .filter(s => s.worldId === worldId && s.state !== SessionState.CLOSED);
     }
 
+    async list(worldId: string): Promise<SessionData[]> {
+        return Array.from(this.sessions.values())
+            .filter(s => s.worldId === worldId);
+    }
+
     async listIncomplete(): Promise<SessionData[]> {
         return Array.from(this.sessions.values())
             .filter(s => s.state !== SessionState.CLOSED);
