@@ -5,26 +5,19 @@ import {
     DrizzleWorldRepository,
     DrizzleWorldConfigRepository,
     DrizzleWorldTelosRepository,
-    CreateWorldInput,
-    UpdateWorldInput
+    CreateWorldSchema,
+    UpdateWorldSchema,
+    WorldIdSchema,
 } from '@loom/core';
 import { createDb } from '@loom/db';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { ZodError } from 'zod';
 
 // Initialize DB and Service outside of handler to keep it singleton-ish
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dbPath = process.env.DB_PATH || path.join(__dirname, '../../../newsforge.db'); // Fallback or env
 
-// Initialize Drizzle
-// createDb expects a path? checking @loom/db usage
-// Assuming createDb returns the db instance or we use existing one.
-// Actually @loom/db exports `createDb` which might take options. 
-// Let's assume standard initialization for now. 
-// If @loom/db creates in-memory by default or configurable, we need to correct this.
-// Checking how main.ts initializes other things.
-
-// We will initialize lazily in registerWorldHandlers or at module level if valid.
 let worldService: WorldService | null = null;
 
 export function registerWorldHandlers(dbPath: string): void {
@@ -38,31 +31,64 @@ export function registerWorldHandlers(dbPath: string): void {
     worldService = new WorldService(worldRepo, telosRepo, configRepo);
 
     // ==========================================
-    // World CRUD
+    // World CRUD with Zod Validation
     // ==========================================
 
-    ipcMain.handle(WorldChannels.CREATE, async (event: IpcMainInvokeEvent, input: CreateWorldInput) => {
-        console.log('[IPC] world:create', input);
-        return await worldService!.create(input);
+    ipcMain.handle(WorldChannels.CREATE, async (event: IpcMainInvokeEvent, input: unknown) => {
+        try {
+            const validated = CreateWorldSchema.parse(input);
+            console.log('[IPC] world:create', validated);
+            return await worldService!.create(validated);
+        } catch (error) {
+            if (error instanceof ZodError) {
+                throw new Error(`Invalid input: ${error.errors.map(e => e.message).join(', ')}`);
+            }
+            throw error;
+        }
     });
 
-    ipcMain.handle(WorldChannels.GET, async (event: IpcMainInvokeEvent, id: string) => {
-        return await worldService!.getById(id);
+    ipcMain.handle(WorldChannels.GET, async (event: IpcMainInvokeEvent, id: unknown) => {
+        try {
+            const validated = WorldIdSchema.parse(id);
+            return await worldService!.getById(validated);
+        } catch (error) {
+            if (error instanceof ZodError) {
+                throw new Error(`Invalid World ID: ${error.errors[0].message}`);
+            }
+            throw error;
+        }
     });
 
     ipcMain.handle(WorldChannels.LIST, async (event: IpcMainInvokeEvent) => {
         return await worldService!.getAll();
     });
 
-    ipcMain.handle(WorldChannels.UPDATE, async (event: IpcMainInvokeEvent, id: string, input: UpdateWorldInput) => {
-        console.log('[IPC] world:update', id, input);
-        return await worldService!.update(id, input);
+    ipcMain.handle(WorldChannels.UPDATE, async (event: IpcMainInvokeEvent, id: unknown, input: unknown) => {
+        try {
+            const validatedId = WorldIdSchema.parse(id);
+            const validatedInput = UpdateWorldSchema.parse(input);
+            console.log('[IPC] world:update', validatedId, validatedInput);
+            return await worldService!.update(validatedId, validatedInput);
+        } catch (error) {
+            if (error instanceof ZodError) {
+                throw new Error(`Invalid input: ${error.errors.map(e => e.message).join(', ')}`);
+            }
+            throw error;
+        }
     });
 
-    ipcMain.handle(WorldChannels.DELETE, async (event: IpcMainInvokeEvent, id: string) => {
-        console.log('[IPC] world:delete', id);
-        return await worldService!.delete(id);
+    ipcMain.handle(WorldChannels.DELETE, async (event: IpcMainInvokeEvent, id: unknown) => {
+        try {
+            const validated = WorldIdSchema.parse(id);
+            console.log('[IPC] world:delete', validated);
+            return await worldService!.delete(validated);
+        } catch (error) {
+            if (error instanceof ZodError) {
+                throw new Error(`Invalid World ID: ${error.errors[0].message}`);
+            }
+            throw error;
+        }
     });
 
-    console.log('[IPC] World handlers registered.');
+    console.log('[IPC] World handlers registered with Zod validation.');
 }

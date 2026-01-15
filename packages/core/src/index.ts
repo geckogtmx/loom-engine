@@ -25,6 +25,9 @@ export * from './llm/providers/AnthropicProvider';
 export * from './llm/ProviderFactory';
 export * from './llm/SystemPromptBuilder';
 
+// IPC Validation Schemas
+export * from './ipc/schemas';
+
 // Agent
 export * from './agent/types';
 export * from './agent/AgentRuntime';
