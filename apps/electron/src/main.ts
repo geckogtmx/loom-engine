@@ -5,6 +5,8 @@ import { WebSocketServer } from 'ws';
 import chokidar from 'chokidar';
 import { registerSessionHandlers } from './ipc/sessionHandlers';
 import { registerWorldHandlers } from './ipc/worldHandlers';
+import { createDb } from '@loom/db';
+import { SecureKeyStore } from './services/SecureKeyStore';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -51,8 +53,28 @@ function createWindow() {
   }
 }
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   createWindow();
+
+  // Initialize database and SecureKeyStore
+  const db = createDb(dbPath);
+  const keyStore = new SecureKeyStore(db);
+
+  // Check if encryption is available
+  if (!SecureKeyStore.isAvailable()) {
+    console.error('[SECURITY] safeStorage encryption not available on this system!');
+    console.error('[SECURITY] API keys cannot be securely stored.');
+  } else {
+    // One-time migration from .env to encrypted storage
+    const existingProviders = await keyStore.listProviders();
+    if (existingProviders.length === 0) {
+      console.log('[SecureKeyStore] No encrypted keys found. Checking .env for migration...');
+      await keyStore.migrateFromEnv();
+    } else {
+      console.log(`[SecureKeyStore] Found ${existingProviders.length} encrypted keys: ${existingProviders.join(', ')}`);
+    }
+  }
+
   registerSessionHandlers(dbPath);
   registerWorldHandlers(dbPath);
 

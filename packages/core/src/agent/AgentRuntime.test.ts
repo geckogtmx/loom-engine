@@ -77,8 +77,12 @@ describe('AgentRuntime', () => {
     it('should detect escalation triggers', () => {
         const runtime = new AgentRuntime(mockProfile, mockTelos);
 
-        expect(runtime.shouldEscalate('Please escalate to human')).toBe(true);
-        expect(runtime.shouldEscalate('Hello agent')).toBe(false);
+        const escalated = runtime.checkEscalation('Please escalate to human');
+        expect(escalated.level).toBe('MEDIUM');
+        expect(escalated.reason).toContain('operator intervention');
+
+        const normal = runtime.checkEscalation('Hello agent');
+        expect(normal.level).toBe('NONE');
     });
 
     it('should append WORLD CONSTRAINTS if present in config', () => {

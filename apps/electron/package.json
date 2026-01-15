@@ -9,6 +9,7 @@
     "lint": "eslint ."
   },
   "devDependencies": {
+    "@types/uuid": "^11.0.0",
     "@types/ws": "^8.18.1",
     "electron": "^33.2.1",
     "electron-builder": "^25.1.8",
@@ -22,6 +23,7 @@
     "better-sqlite3": "^11.7.0",
     "chokidar": "^5.0.0",
     "dotenv": "^17.2.3",
+    "uuid": "^9.0.0",
     "ws": "^8.19.0",
     "zod": "^3.22.4"
   }

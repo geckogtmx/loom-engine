@@ -37,7 +37,7 @@ describe('Dispatcher System', () => {
     it('should ALLOW dispatch if session is ACTIVE', async () => {
         const result = await dispatcher.dispatch(context, SessionState.ACTIVE, spines);
         expect(result.success).toBe(true);
-        expect(result.output).toContain('[DISPATCHED PROMPT PREVIEW]');
+        expect(result.output).toContain('[DRY-RUN MODE]');
     });
 
     it('should SELECT relevant spines based on keywords', async () => {

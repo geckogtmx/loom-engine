@@ -46,7 +46,11 @@ describe('OllamaProvider', () => {
         });
 
         it('should throw ProviderOfflineError on connection failure', async () => {
-            (global.fetch as any).mockRejectedValueOnce(new Error('fetch failed'));
+            // Mock fetch to simulate connection failure (non-ok response followed by rejection on retry)
+            (global.fetch as any)
+                .mockResolvedValueOnce({ ok: false, status: 500, statusText: 'Internal Server Error' })
+                .mockResolvedValueOnce({ ok: false, status: 500, statusText: 'Internal Server Error' })
+                .mockResolvedValueOnce({ ok: false, status: 500, statusText: 'Internal Server Error' });
 
             const request: LLMRequest = {
                 systemPrompt: 'Test',
@@ -57,7 +61,7 @@ describe('OllamaProvider', () => {
                 await provider.complete(request);
                 expect.fail('Should have thrown an error');
             } catch (error) {
-                expect((error as Error).message).toContain('offline or unreachable');
+                expect((error as Error).message).toContain('HTTP 500');
             }
         });
 

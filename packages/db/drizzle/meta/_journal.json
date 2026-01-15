@@ -15,6 +15,13 @@
       "when": 1768445393326,
       "tag": "0001_tearful_vanisher",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1768514819976,
+      "tag": "0002_peaceful_scorpion",
+      "breakpoints": true
     }
   ]
 }
