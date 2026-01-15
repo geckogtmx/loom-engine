@@ -11,35 +11,35 @@
 
 ## Current Status
 **Date:** 2026-01-14
-**Phase:** Phase 5 (Pattern System) - *Core Runtime & Robustness Complete (70%)*
+**Phase:** Phase 5 (Pattern System) - *Core Content & Logic Complete (80%)*
 **Last Model:** Gemini
-**Tests:** ✅ 87 passing (Packages/Core) | Coverage: TBD
+**Tests:** ✅ 88 passing (Packages/Core) | Coverage: TBD
 
 ## Latest Handoff Note
 
 **Context:**
-Phase 5 (Pattern System) is well underway.
-We have a robust execution engine (`Lifecycle`, `StepRunner`, `Registry`, `AbortService`).
-We have verified multi-step execution with "Fact Check" and "Option Burst" patterns.
-Parser is hardened to handle Inputs/Outputs.
+Phase 5 is nearing completion.
+We have the Runtime (Lifecycle, Runner, Abort, Registry) and now **5 Core Patterns** defined and verified.
+We also started Phase 6 Research with a `SpineGenerator` prototype.
+All 88 tests are passing, including pattern definition checks.
 
 **Accomplished This Session:**
-*   ✅ **Robustness:** Implemented `PatternAbortService` for clean cancellation.
-*   ✅ **Robustness:** Hardened `PatternParser` to support `## Inputs` extraction via regex.
-*   ✅ **Content:** Created "Fact Check" Multi-Step Pattern.
-*   ✅ **Testing:** Verified End-to-End flow for multi-step patterns.
-*   ✅ **Testing:** 87/87 tests passing (5 new tests).
+*   ✅ **Core Patterns:** Created `Metaphor Bloom`, `Narrative Spine`, `Framework Forge`.
+*   ✅ **Testing:** Validated all 5 Markdown patterns with `PatternDefinitions.test.ts`.
+*   ✅ **Phase 6 Research:** Created `SpineGenerator.ts` prototype (heuristic dispatcher).
+*   ✅ **Repository:** Added `getByName` helper to Registry (Fixed type errors in dispatcher).
+*   ✅ **Testing:** 88/88 tests passing.
 
 **Pending (Phase 5 Tasks):**
-*   **Dispatcher (Phase 6 pre-req):** We need to start thinking about how to route to these patterns dynamically.
-*   **Remaining 12 Core Patterns:** We have 2/14.
-*   **Agent Integration:** `PatternStepRunner` still uses a mock LLM. Phase 7 will replace this.
+*   **Remaining 9 Core Patterns:** (See `AI_CODEX.md` for full list).
+*   **Database Sync:** We need to ensure `PatternRegistry.loadFromL3` actually syncs these MD files to the DB. (Currently just parses).
 
 **Next Instruction:**
 ```
 1. Run: cd packages/core && npx vitest run
-2. Implement: Three more Core Patterns: "Metaphor Bloom", "Narrative Spine", "Framework Forge".
-3. Research: Start Phase 6 (Dispatcher) by creating the `SpineGenerator` prototype.
+2. Implement: `PatternRepository.sync(pattern)` to save parsed patterns to SQLite `patterns` table.
+3. Implement: The remaining Core Patterns (batches of 3-4).
+4. Refine: `SpineGenerator` to integration with `SessionIntentEnvelope`.
 ```
 
 ---
@@ -48,18 +48,17 @@ Parser is hardened to handle Inputs/Outputs.
 
 | File | Purpose |
 |------|---------|
-| `packages/core/src/pattern/abort/PatternAbortService.ts` | Abort logic |
-| `packages/core/src/pattern/PatternParser.ts` | Hardened markdown parser |
-| `packages/core/src/pattern/PatternIntegration.test.ts` | Multi-step integration tests |
-| `knowledge/03_Entities/Patterns/Fact Check.md` | New Pattern Content |
-| `task.md` | Session task tracking |
+| `knowledge/03_Entities/Patterns/*.md` | Core Pattern Definitions |
+| `packages/core/src/pattern/PatternDefinitions.test.ts` | Verification for MD files |
+| `packages/core/src/dispatcher/SpineGenerator.ts` | Phase 6 Prototype |
+| `packages/core/src/pattern/PatternRegistry.ts` | Added search by name |
 
 ---
 
 ## History Log
 *(Newest First)*
 
+*   **2026-01-14 (Gemini):** Phase 5 Core Patterns (5 total), SpineGenerator. 88 Tests.
 *   **2026-01-14 (Gemini):** Phase 5 Robustness (Abort, Parser, Fact Check). 87 Tests.
 *   **2026-01-14 (Gemini):** Phase 5 Execution Engine. Lifecycle, StepRunner, Option Burst. 82 Tests.
 *   **2026-01-14 (Gemini):** Phase 5 Started. Schema, Registry, Primacy, Tempo. 81 Tests.
-*   **2026-01-14 (Claude):** Phase 3 (1-3), CI, coverage, E2E deferral. 60 tests.
