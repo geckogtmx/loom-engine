@@ -40,8 +40,17 @@ We operate in a Multi-Model environment. You do not share context with the next 
 *   **Language:** TypeScript (Strict).
 *   **Style:** Functional over Class-based (except for Core Services).
 *   **Naming:** `PascalCase` for Components/Classes, `camelCase` for functions/vars, `snake_case` for DB columns.
-*   **Testing:** Vitest for Logic, Playwright for E2E.
+*   **Testing:** Vitest for Logic, Playwright for E2E. **See `TESTING.md` for full QA guide.**
 *   **Error Handling:** Never swallow errors. Fail loudly or degrade gracefully to "Offline Mode".
+
+## 4.1 QA Mandate
+
+> **All new features MUST include unit tests. All PRs MUST pass the test suite.**
+
+*   Run tests: `cd packages/core && npx vitest run`
+*   New tests go in `<feature>.test.ts` adjacent to the source file.
+*   Cover: happy path, edge cases, error conditions.
+*   See `TESTING.md` for conventions and templates.
 
 ## 5. File Structure Strategy
 
