@@ -12,6 +12,7 @@ interface WorldState {
     createWorld: (input: CreateWorldInput) => Promise<void>;
     selectWorld: (worldId: string) => Promise<void>;
     deleteWorld: (worldId: string) => Promise<void>;
+    setActiveWorld: (worldId: string) => void;
 }
 
 export const useWorldStore = create<WorldState>((set, get) => ({
@@ -73,5 +74,9 @@ export const useWorldStore = create<WorldState>((set, get) => ({
         } catch (err: any) {
             set({ error: err.message, isLoading: false });
         }
+    },
+
+    setActiveWorld: (worldId: string) => {
+        get().selectWorld(worldId);
     }
 }));

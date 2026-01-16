@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { Layout } from './components/Layout';
+import { MainLayout } from './components/layout/MainLayout';
+import { ThemeProvider } from './components/theme/ThemeProvider';
 import { useWorldStore } from './store/useWorldStore';
 import { useSessionStore } from './store/useSessionStore';
 import { SessionsView } from './components/SessionsView';
 import { SessionRunner } from './components/SessionRunner';
 import { Globe, Activity, FileText } from 'lucide-react';
 
-type View = 'DASHBOARD' | 'SESSIONS' | 'RUNNER';
+import { useUIStore } from './store/useUIStore';
+import { EngineManager } from './components/views/EngineManager';
+import { WorldsDashboard } from './components/views/WorldsDashboard';
 
 function App() {
     const { activeWorld } = useWorldStore();
     const { activeSession } = useSessionStore();
-    const [view, setView] = useState<View>('DASHBOARD');
+    const { activeView, setView } = useUIStore();
 
     // Reset view when world changes
     useEffect(() => {
@@ -26,72 +29,46 @@ function App() {
     }, [activeSession]);
 
     return (
-        <Layout>
-            <div className="h-full flex flex-col p-8">
-                {activeWorld ? (
-                    view === 'RUNNER' ? (
-                        <SessionRunner onBack={() => setView('SESSIONS')} />
-                    ) : view === 'SESSIONS' ? (
+        <ThemeProvider>
+            <MainLayout>
+                {activeView === 'ENGINE_MANAGER' && <EngineManager />}
+
+                {activeView === 'DASHBOARD' && (
+                    <div className="h-full flex flex-col p-8">
+                        <WorldsDashboard />
+                    </div>
+                )}
+
+                {activeView === 'SESSIONS' && activeWorld && (
+                    <div className="h-full flex flex-col p-8">
                         <SessionsView onBack={() => setView('DASHBOARD')} />
-                    ) : (
-                        <div className="max-w-4xl mx-auto w-full space-y-8 animate-in fade-in duration-500">
-                            {/* Header */}
-                            <div>
-                                <div className="flex items-center gap-3 mb-2">
-                                    <span className="px-2 py-1 bg-indigo-500/10 text-indigo-400 text-xs rounded border border-indigo-500/20 uppercase font-bold tracking-wider">
-                                        {activeWorld.status}
-                                    </span>
-                                    <span className="text-slate-500 text-sm font-mono">{activeWorld.id}</span>
-                                </div>
-                                <h1 className="text-4xl font-extrabold text-white tracking-tight">{activeWorld.name}</h1>
-                                <p className="mt-2 text-lg text-slate-400 leading-relaxed max-w-2xl">
-                                    {activeWorld.purpose}
-                                </p>
-                            </div>
+                    </div>
+                )}
 
-                            {/* Dashboard Grid */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                <div
-                                    onClick={() => setView('SESSIONS')}
-                                    className="bg-slate-900/50 border border-slate-800 p-6 rounded-xl hover:bg-slate-900 hover:border-indigo-500/50 transition-all cursor-pointer group"
-                                >
-                                    <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-400 mb-4 group-hover:bg-blue-500/20 group-hover:scale-110 transition-all">
-                                        <Activity size={20} />
-                                    </div>
-                                    <h3 className="font-semibold text-slate-200 mb-1 group-hover:text-white">Sessions</h3>
-                                    <p className="text-sm text-slate-500 group-hover:text-slate-400">Manage and run active sessions in this world.</p>
-                                </div>
+                {activeView === 'RUNNER' && activeSession && (
+                    <div className="h-full flex flex-col p-8">
+                        <SessionRunner onBack={() => setView('SESSIONS')} />
+                    </div>
+                )}
 
-                                <div className="bg-slate-900/50 border border-slate-800 p-6 rounded-xl hover:bg-slate-900 hover:border-emerald-500/50 transition-all cursor-pointer group">
-                                    <div className="w-10 h-10 bg-emerald-500/10 rounded-lg flex items-center justify-center text-emerald-400 mb-4 group-hover:bg-emerald-500/20 group-hover:scale-110 transition-all">
-                                        <FileText size={20} />
-                                    </div>
-                                    <h3 className="font-semibold text-slate-200 mb-1 group-hover:text-white">Telos & Config</h3>
-                                    <p className="text-sm text-slate-500 group-hover:text-slate-400">Edit the foundational definition and rules.</p>
-                                </div>
-
-                                <div className="bg-slate-900/50 border border-slate-800 p-6 rounded-xl hover:bg-slate-900 hover:border-purple-500/50 transition-all cursor-pointer group">
-                                    <div className="w-10 h-10 bg-purple-500/10 rounded-lg flex items-center justify-center text-purple-400 mb-4 group-hover:bg-purple-500/20 group-hover:scale-110 transition-all">
-                                        <Globe size={20} />
-                                    </div>
-                                    <h3 className="font-semibold text-slate-200 mb-1 group-hover:text-white">Knowledge Graph</h3>
-                                    <p className="text-sm text-slate-500 group-hover:text-slate-400">Explore the L3 persistent memory structures.</p>
-                                </div>
-                            </div>
-
-                        </div>
-                    )
-                ) : (
-                    <div className="h-full flex flex-col items-center justify-center text-center opacity-0 animate-in fade-in duration-700">
+                {/* Fallback state when no world is selected but trying to view session/runner */}
+                {((activeView === 'SESSIONS' || activeView === 'RUNNER') && !activeWorld) && (
+                    <div className="h-full flex flex-col items-center justify-center text-center animate-in fade-in duration-700">
                         <div className="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center mb-4 ring-1 ring-slate-700">
                             <Globe className="text-slate-500" size={24} />
                         </div>
                         <h2 className="text-xl font-semibold text-slate-200">No World Selected</h2>
-                        <p className="text-slate-500 mt-1 max-w-sm">Select a world from the sidebar or create a new one to get started.</p>
+                        <p className="text-slate-500 mt-1 max-w-sm">Select a world from the sidebar to continue.</p>
+                        <button
+                            onClick={() => setView('DASHBOARD')}
+                            className="mt-6 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 transition-colors"
+                        >
+                            Back to Dashboard
+                        </button>
                     </div>
                 )}
-            </div>
-        </Layout>
+            </MainLayout>
+        </ThemeProvider>
     );
 }
 
