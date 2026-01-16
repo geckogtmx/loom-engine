@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "postinstall": "electron-builder install-app-deps"
   },
   "devDependencies": {
     "@types/uuid": "^9.0.8",

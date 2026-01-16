@@ -3,6 +3,8 @@ import { WorldChannels } from './channels';
 import {
     WorldService,
     DrizzleWorldRepository,
+    DrizzleWorldTelosRepository,
+    DrizzleWorldConfigRepository,
     CreateWorldSchema,
     UpdateWorldSchema,
     WorldIdSchema,
@@ -25,10 +27,12 @@ export function registerWorldHandlers(dbPath: string): void {
 
     const db = createDb(dbPath);
 
-    // WorldService initialization - repositories are internal to WorldService
-    // For now, we'll defer full initialization until WorldService constructor is updated
-    // This is a TODO for Phase 3 cleanup
-    worldService = null as any; // Placeholder - Phase 3 work needed
+    // WorldService initialization
+    const repository = new DrizzleWorldRepository(db);
+    const telosRepository = new DrizzleWorldTelosRepository(db);
+    const configRepository = new DrizzleWorldConfigRepository(db);
+
+    worldService = new WorldService(repository, telosRepository, configRepository);
 
     // ==========================================
     // World CRUD with Zod Validation

@@ -11,7 +11,11 @@ import { SecureKeyStore } from './services/SecureKeyStore';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Configuration
-const dbPath = process.env.DB_PATH || path.join(app.getPath('userData'), 'loom.db');
+const isDev = !app.isPackaged;
+const dbPath = process.env.DB_PATH || (isDev
+  ? path.join(__dirname, '../../../packages/db/local.db')
+  : path.join(app.getPath('userData'), 'loom.db'));
+console.log(`[Main] Using Database: ${dbPath}`);
 
 // WebSocket Server for Streaming
 const wss = new WebSocketServer({ port: 8080 });
@@ -78,8 +82,16 @@ function createWindow() {
     titleBarStyle: 'hidden',
   });
 
-  if (process.env.VITE_DEV_SERVER_URL) {
-    win.loadURL(process.env.VITE_DEV_SERVER_URL);
+  // In development, load from the Web App port (5174)
+  // In development, we MUST load the Web App (Renderer) port.
+  // The VITE_DEV_SERVER_URL env var often points to Electron's own vite server (5175),
+  // which causes a blank white screen. We explicitly target the Renderer (5174).
+  const isDev = !app.isPackaged; // or process.env.NODE_ENV === 'development'
+
+  if (isDev) {
+    console.log('[Main] Development Mode detected. Loading http://localhost:5174');
+    win.loadURL('http://localhost:5174');
+    win.webContents.openDevTools();
   } else {
     win.loadFile(path.join(__dirname, '../renderer/index.html'));
   }
@@ -109,6 +121,10 @@ app.whenReady().then(async () => {
 
   registerSessionHandlers(dbPath);
   registerWorldHandlers(dbPath);
+
+  ipcMain.handle('window:close', () => {
+    app.quit();
+  });
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();

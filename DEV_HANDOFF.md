@@ -16,19 +16,16 @@ We have successfully scaffolded the Operator UI, implemented a robust theme syst
 *   **Dependencies:** Added `@xyflow/react`, `dnd-kit`, `xterm`.
 *   **Linting:** Resolved core syntax issues in `App.tsx` and `useWorldStore`.
 
-## ⏭️ Next Instructions (Phase 8.1)
-1.  **Data Wiring:**
-    *   Connect `WorldsDashboard` to real data via `useWorldStore` (currently scaffolded).
+## ⏭️ Next Instructions (Phase 8.1 - PRIORITY)
+1.  **DEBUG IPC HANDLERS:** Investigate why `registerWorldHandlers` in `apps/electron/src/main.ts` fails to register `world:create` and others. Check for exceptions during app launch.
+2.  **Data Wiring:**
+    *   Connect `WorldsDashboard` to real data via `useWorldStore` (once handlers work).
     *   Replace mock data in `StatusFooter` with real connection/cost stats.
-2.  **Session Runner:**
-    *   Implement the chat interface in `SessionRunner.tsx` using `xterm.js` or a standard chat UI.
-    *   Wire up `useSession` to the actual backend WebSocket.
-3.  **Engine Manager:**
-    *   Implement A0 policy configuration UI.
 
 ## 🐛 Known Issues
 *   `activeView` logic in `App.tsx` is functional but simplistic; may need true routing if complexity grows.
 *   `AuthStatus` is currently hardcoded to "authenticated" in UI for visual verification; needs backend signal.
+*   **[CRITICAL]** IPC Handler Initialization Failure: `world:create` throws "No handler registered" despite code updates. Suspect initialization crash in `registerWorldHandlers`.
 
 ## 📝 Credentials & Config
 *   **Themes:** "Antigravity" is now the default or selectable option.

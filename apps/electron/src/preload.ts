@@ -21,6 +21,9 @@ contextBridge.exposeInMainWorld('api', {
     detectIncomplete: () => ipcRenderer.invoke(SessionChannels.DETECT_INCOMPLETE),
     recover: (sessionId: string, action: string) => ipcRenderer.invoke(SessionChannels.RECOVER, sessionId, action),
   },
+  window: {
+    close: () => ipcRenderer.invoke('window:close'),
+  },
   // Existing APIs (if any, preserving structure)
 });
 

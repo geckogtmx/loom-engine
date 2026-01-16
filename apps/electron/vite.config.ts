@@ -11,14 +11,14 @@ export default defineConfig({
           build: {
             outDir: 'dist',
             rollupOptions: {
-              external: ['electron', 'better-sqlite3'],
+              external: ['electron', 'better-sqlite3', 'ws', 'bufferutil', 'utf-8-validate'],
             },
           },
         },
       },
       {
         entry: 'src/preload.ts',
-        onready(options) {
+        onstart(options) {
           options.reload();
         },
         vite: {
@@ -33,5 +33,9 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
+  },
+  server: {
+    port: 5175,
+    strictPort: true,
   },
 });

@@ -25,6 +25,9 @@ declare global {
         api: {
             world: WorldApi;
             session: SessionApi;
+            window: {
+                close: () => Promise<void>;
+            };
         };
     }
 }

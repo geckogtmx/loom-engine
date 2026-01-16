@@ -1,7 +1,7 @@
 import React from 'react';
 import { WorldSelector } from '../WorldSelector';
 import { ThemeSwitcher } from '../theme/ThemeSwitcher';
-import { Home, LayoutDashboard, Settings, Layers } from 'lucide-react';
+import { Home, LayoutDashboard, Settings, Layers, Power } from 'lucide-react';
 
 import { useUIStore } from '../../store/useUIStore';
 
@@ -10,14 +10,23 @@ export const Sidebar: React.FC = () => {
     return (
         <aside className="w-64 border-r border-slate-800 bg-slate-900/50 flex flex-col backdrop-blur-sm">
             {/* Header */}
-            <div className="p-4 border-b border-slate-800 flex items-center gap-3">
-                <div className="w-8 h-8 bg-indigo-500/10 rounded-lg flex items-center justify-center border border-indigo-500/20 text-indigo-400 font-bold">
-                    L
+            <div className="p-4 border-b border-slate-800 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-indigo-500/10 rounded-lg flex items-center justify-center border border-indigo-500/20 text-indigo-400 font-bold">
+                        L
+                    </div>
+                    <div>
+                        <h1 className="font-bold text-sm tracking-wide text-indigo-100">LOOM Engine</h1>
+                        <div className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold">Operator Active</div>
+                    </div>
                 </div>
-                <div>
-                    <h1 className="font-bold text-sm tracking-wide text-indigo-100">LOOM Engine</h1>
-                    <div className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold">Operator Active</div>
-                </div>
+                <button
+                    onClick={() => window.api.window.close()}
+                    className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-md transition-all duration-200 group"
+                    title="Quit Application"
+                >
+                    <Power size={16} />
+                </button>
             </div>
 
             {/* World Context */}
