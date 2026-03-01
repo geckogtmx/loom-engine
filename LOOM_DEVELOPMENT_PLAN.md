@@ -1,8 +1,8 @@
 # LOOM Engine — Development Plan
 
-**Version:** 1.2
+**Version:** 2.0
 **Status:** Active
-**Last Updated:** 2026-01-14
+**Last Updated:** 2026-03-01
 
 > This document translates the LOOM Engine conceptual specification into an actionable development plan. It consolidates all canonical and V2 materials into phases, features, stack decisions, and a detailed TODO.
 
@@ -11,12 +11,15 @@
 ## Table of Contents
 
 1. [Executive Summary](#1-executive-summary)
+   - 1.5 [Engineering Disciplines Framework](#15-engineering-disciplines-framework) *(v2.0)*
+   - 1.6 [DeepMind Autonomy Levels](#16-deepmind-autonomy-levels--unifying-control-framework) *(v2.0)*
 2. [Technical Stack](#2-technical-stack)
-3. [Development Phases](#3-development-phases)
-4. [Complete Feature List](#4-complete-feature-list)
+3. [Development Phases](#3-development-phases) — includes Phase 0.5 MVP Sprint *(v2.0)*
+4. [Complete Feature List](#4-complete-feature-list) — includes 4.12 Engineering Discipline Features *(v2.0)*
 5. [Detailed TODO](#5-detailed-todo)
 6. [Dependencies & Critical Path](#6-dependencies--critical-path)
 7. [Validation Strategy](#7-validation-strategy)
+8. [OPUS Review — Discrepancy Resolutions](#8-opus-review--discrepancy-resolutions-v20) *(v2.0)*
 
 ---
 
@@ -52,6 +55,152 @@ The system is built as a **desktop harness** (Electron) that:
 
 ---
 
+## 1.5 Engineering Disciplines Framework
+
+LOOM independently implements three emerging engineering disciplines recognized by the industry in 2025-2026. This section makes that mapping explicit — both for strategic positioning and to validate that the architecture is on the right track.
+
+### 1.5.1 Context Engineering
+
+**Definition:** The systematic design of everything an LLM sees at runtime — system prompts, retrieved documents, memory, tool definitions, and prior outputs. The goal is to provide the "right tokens" so the agent doesn't have to guess or fetch information mid-task. Recognized as the successor to "prompt engineering" (Gartner, 2025).
+
+**LOOM implements this as the 4-Layer Memory Model:**
+
+| Context Engineering Principle | LOOM Implementation | Layer |
+|-------------------------------|---------------------|-------|
+| Static instructions (immutable identity/constraints) | L4 — Telos | Identity |
+| Semi-static knowledge (domain refs, definitions) | L3 — Knowledge (World/Pattern/Agent definitions) | Knowledge |
+| Dynamic conversation (session history, decisions) | L2 — Episodic (append-only session logs) | Continuity |
+| Ephemeral scratchpad (working memory) | L1 — Active (in-memory, flushed on close) | Runtime |
+| Context budget management | ContextAssembler + SpineGenerator | Phase 2, 6 |
+
+**Gaps to close:**
+- Context quality scoring (relevance ranking when L3 exceeds token budget)
+- Tool-augmented retrieval (agents fetch context on demand via governed tools)
+- Token budget optimization with dynamic assembly per task type
+
+### 1.5.2 Intent Engineering
+
+**Definition:** Encoding goals, values, and decision hierarchies into the system. The "strategy" layer ensuring agents optimize for the right outcomes — not just any output, but the *intended* output.
+
+**LOOM implements this as:**
+
+| Intent Engineering Principle | LOOM Implementation | Status |
+|------------------------------|---------------------|--------|
+| Intent source ("never infer, always ask") | Operator Supremacy (AI_CODEX Mandate #1) | Core mandate |
+| Intent capture (question-only phase) | Primacy Protection (Phase 0 of all Patterns) | Implemented |
+| Intent contract (immutable session expectations) | Session Intent Envelope (SIE) | Implemented |
+| Intent store (highest-level purpose) | L4 Telos (Operator, World, Agent) | Implemented |
+| Intent boundary enforcement | Silence by Default (AI_CODEX Mandate #2) | Core mandate |
+
+**Gaps to close:**
+- Intent decomposition pipeline: Goal → Plan → Task → Action
+- Intent drift detection: alerting when execution diverges from SIE during a session
+- Intent verification: checking outcomes against original intent at session end
+- Intent persistence: tracking the original intent through all subsequent actions
+
+### 1.5.3 Specification Engineering (Spec-Based Development)
+
+**Definition:** Driving agent behavior through formal or semi-formal specifications rather than imperative code or ad-hoc prompts. Splits work into *thinking* (humans write specifications) and *doing* (agents execute against specs). Recognized by Thoughtworks and ICSE 2026 as an emerging methodology.
+
+**LOOM implements five core Spec Engineering sub-concepts:**
+
+| Spec Engineering Concept | Definition | LOOM Equivalent | Status |
+|--------------------------|-----------|-----------------|--------|
+| **Self-Contained Problem Statements** | Stating a problem with enough context that it is solvable without further information | Session Intent Envelope — captures goal, constraints, audience, scope boundaries | Implemented (Phase 2) |
+| **Acceptance Criteria** | Clearly defining what "done" looks like so the agent knows when to stop | Pattern Completion Conditions — define exit criteria per Pattern step | Implemented (Phase 5) |
+| **Constraint Architecture** | Explicitly defining must-do, must-not-do, and escalation points | META Rules + A0 Enforcement + Agent Role Constraints + Bounded Initiative | Implemented (Phases 1, 4) |
+| **Decomposition** | Breaking projects into modular sub-tasks that can be executed and verified independently | Pattern 10-Phase Lifecycle — each phase is a governed, verifiable unit of work | Implemented (Phase 5) |
+| **Evaluation** | Building measurable test cases to prove output quality | Replication Layer (Phase 14) + Agent Behavior Signals (Phase 4) | Partial — Behavior Signals implemented, Replication Layer deferred |
+
+**Gaps to close:**
+- Machine-parseable specs: auto-generate test skeletons, conformance checks, and task checklists from markdown definitions in L3
+- Spec validation: programmatic verification that agent output conforms to spec constraints
+
+### 1.5.4 How the Three Disciplines Intersect in LOOM
+
+```
+Specification Engineering (what to build)
+    │  L3 Knowledge specs define patterns, agents, constraints
+    ↓
+Intent Engineering (why to build it, for whom)
+    │  SIE + Primacy + L4 Telos encode purpose and boundaries
+    ↓
+Context Engineering (what the agent sees when building it)
+    │  4-Layer assembly delivers the right tokens to the model
+    ↓
+Governed Execution (Pattern → Agent → Output)
+    │  META authorizes, A0 enforces, ENGINE executes
+    ↓
+Structured Continuity (L2 summary → next session)
+```
+
+> **Strategic positioning:** LOOM is — architecturally — a Context Engineering + Intent Engineering + Specification Engineering platform. These disciplines describe what LOOM already does. This framework is not new functionality to build; it is the vocabulary for explaining what exists.
+
+---
+
+## 1.6 DeepMind Autonomy Levels — Unifying Control Framework
+
+Google DeepMind proposed a 5-level taxonomy of human-agent interaction (2024-2025) that defines how much control the human retains versus how much the agent acts independently. LOOM already has the primitives for every level, but they are scattered across separate systems (Tempo, Session Classes, Bounded Initiative, Dispatch Gate, Anti-Agency Constraint) with no unified control surface.
+
+### The 5 Levels
+
+| Level | Name | Description | LOOM Equivalent |
+|-------|------|-------------|-----------------|
+| **L1** | **Operator** | Human in charge at all times. Agent performs simple tasks with strict approval. | Operator Supremacy + Anti-Agency Constraint (current default) |
+| **L2** | **Collaborator** | Human and agent plan/execute together. Easy transfer of control. | Primacy Protection + SIE negotiation + Pattern handoffs |
+| **L3** | **Consultant** | Agent takes initiative in planning, offers suggestions. Human provides guidance. | Tempo Andante/Adagio + Pattern suggestion + Dispatcher recommendations |
+| **L4** | **Approver** | Agent acts independently, pauses for human approval on high-risk actions. | DEEP Session Class + Dispatch Gate + A0 budget enforcement |
+| **L5** | **Observer** | Agent is fully autonomous. End-to-end execution without supervision. | Not currently supported (by design — requires mature governance) |
+
+### The Autonomy Dial
+
+LOOM needs a single, explicit **Autonomy Level** setting that acts as a master control, cascading across all subsystems:
+
+```
+┌─────────────────────────────────────────────────────────┐
+│              AUTONOMY LEVEL (Operator-Set)               │
+│                                                          │
+│   L1 ──── L2 ──── L3 ──── L4 ──── L5                   │
+│   Full         Collaborative       Autonomous            │
+│   Control      Partnership         (Governed)            │
+│                                                          │
+│   Current default: L1-L2 (Operator Supremacy)           │
+│   Maximum allowed: Configurable per World               │
+└─────────────────┬───────────────────────────────────────┘
+                  │ Cascades to:
+                  ▼
+  Session Class  │  Tempo        │  Agent Initiative  │  Tool Access
+  ─────────────  │  ─────────── │  ───────────────── │  ───────────
+  L1: THIN only  │  L1: Allegro │  L1: Execute only  │  L1: None/Read
+  L2: THIN/STD   │  L2: Andante │  L2: Propose+wait  │  L2: Read+safe
+  L3: STD default│  L3: Andante │  L3: Suggest+act   │  L3: Most tools
+  L4: Any        │  L4: Any     │  L4: Act, pause    │  L4: All governed
+  L5: Any        │  L5: Any     │      on high-risk  │  L5: All (audit)
+```
+
+### Implementation
+
+- `autonomy_level`: L1 variable (session-scoped, like Tempo), values 1-5, default 1
+- `max_autonomy_level`: World config (governance ceiling per World)
+- `max_autonomy_level`: Org Telos (future — organizational ceiling)
+- All existing gate checks reference autonomy level (DispatchGate, A0Enforcer, Agent initiative bounds, Tool access permissions)
+
+### Anti-Agency Constraint Reframed
+
+The Anti-Agency Constraint ("No emergent, implicit, or self-directed agency") is reframed as **"No ungoverned agency."** Governed autonomy — where the Operator explicitly chooses the level, META enforces the ceiling, A0 monitors continuously, and the Operator can revoke at any moment — is consistent with Operator Supremacy. The Operator who chooses L4 is *exercising* supremacy by choosing to delegate.
+
+### Rollout
+
+| When | What |
+|------|------|
+| **MVP** | Default to L1-L2. Don't build the dial yet. All existing behavior is correct. |
+| **V1.5** | Add `autonomy_level` to Session state, `max_autonomy_level` to World config. Expose L1-L3 in UI. |
+| **V2** | Enable L4 (Approver). Requires robust tool governance (Phase 11) and audit trail (Phase 12). |
+| **V3+** | Enable L5 (Observer) with full safeguards. Requires mature governance, proven A0, user trust. |
+| **Org-LOOM** | Org Telos sets max autonomy for the organization. Different teams/Worlds operate at different levels. |
+
+---
+
 ## 2. Technical Stack
 
 ### 2.1 Frontend (Operator UI)
@@ -75,7 +224,7 @@ The system is built as a **desktop harness** (Electron) that:
 | Runtime | Electron 33+ | Cross-platform, mature, Node.js access |
 | Bundler | Vite | Fast HMR, ESM-native, Electron compatibility |
 | Packaging | electron-builder | Multi-platform builds, auto-update support |
-| IPC | Electron contextBridge | Secure main/renderer communication |
+| IPC | **electron-trpc** *(replaces contextBridge)* | Type-safe RPC eliminates manual handler registration bugs; end-to-end TypeScript safety between renderer and main process |
 | Streaming | WebSocket | Real-time agent output to UI |
 
 ### 2.3 Persistence Layer
@@ -94,15 +243,17 @@ The system is built as a **desktop harness** (Electron) that:
 | Component | Technology | Justification |
 |-----------|------------|---------------|
 | Local Models | **Ollama (PRIMARY)** | Privacy, offline, cost elimination for THIN sessions |
-| Orchestration | LangChain (thin layer) | Prompting, model routing, chain composition |
+| Orchestration | **OrchestratorPort interface** (LangChain as default impl) | Abstract orchestration behind a port; LangChain implements today, swappable tomorrow |
 | Cloud Backends | OpenAI, Anthropic, Google, DeepSeek | Multi-model support for STANDARD/DEEP sessions |
+| Streaming UI | AI SDK (Vercel) | Well-maintained streaming UX primitives, model-agnostic |
 
 **Key Constraints:**
-- LangChain is **plumbing**, not an agent runtime
+- LangChain is **plumbing behind an abstraction**, not an agent runtime
 - No autonomous LangChain agents — only Pattern-bound chains
 - Local models are the **default**; cloud is opt-in
 - Per-session model selection visible in UI
 - Per-Agent model preferences supported
+- LangChain is wrapped behind `OrchestratorPort` interface for future swappability
 
 ### 2.5 Testing
 
@@ -122,6 +273,38 @@ The system is built as a **desktop harness** (Electron) that:
 | Type Checking | TypeScript strict mode |
 | Git Hooks | Husky + lint-staged |
 | Documentation | TypeDoc |
+
+### 2.7 Tech Stack Amendments (v2.0 — from OPUS Review)
+
+**Replaced:**
+
+| Old | New | Rationale |
+|-----|-----|-----------|
+| Manual IPC handlers (contextBridge) | **electron-trpc** | Eliminates entire class of handler registration bugs; end-to-end type safety |
+| LangChain as direct dependency | **OrchestratorPort** (LangChain as default impl) | Reduces coupling; enables future swap to ADK, native, or other orchestrators |
+
+**Added:**
+
+| Component | Technology | Rationale |
+|-----------|------------|-----------|
+| Markdown processing | Marked or MDX | Required for "Markdown is Canonical" — parse, render, validate markdown specs |
+| Data fetching/caching | @tanstack/query | Handles loading states, caching, refetching for the web UI layer |
+| Agent shell access | node-pty (future) | Run commands, capture output, stream to xterm.js for agent tool access |
+| Streaming UI primitives | AI SDK (Vercel) | Well-maintained, model-agnostic streaming response handling |
+
+**OrchestratorPort Interface:**
+```typescript
+interface OrchestratorPort {
+  assemble(layers: ContextLayers): AssembledContext;
+  route(context: AssembledContext, pipeline: Pipeline): ExecutionPlan;
+  execute(plan: ExecutionPlan): AsyncIterable<ExecutionEvent>;
+}
+// LangChain implements this today. ADK or a native implementation could replace it tomorrow.
+```
+
+**Deferred for MVP (keep in plan, don't build yet):**
+- @xyflow/react — graph visualization (not needed until agent/pattern visualization is built)
+- dnd-kit — drag and drop (not needed until complex UI interactions are built)
 
 ---
 
@@ -145,6 +328,63 @@ The system is built as a **desktop harness** (Electron) that:
 
 ---
 
+### Phase 0.5: MVP Sprint — Hello World Journey
+
+**Goal:** Define and deliver the smallest version of LOOM that demonstrates persistent, governed AI collaboration to real users. This is the first shippable artifact — it proves the core thesis before the full Phase 0-8 buildout completes.
+
+**The Hello World User Journey:**
+1. User opens LOOM → sees "Create your first project" prompt
+2. Types project purpose (e.g., "Marketing strategy for my coffee shop")
+3. LOOM creates a World with name, purpose, default agent, default pattern
+4. User starts chatting — AI remembers everything within the session
+5. User closes LOOM, returns next day — everything persists, recap provided automatically
+6. User starts a new session — AI provides a structured summary of where they left off
+7. After 3 sessions, user has structured output exportable as markdown
+
+**If this journey works, LOOM has demonstrated its core value.** Everything else is enhancement.
+
+**MVP Feature Set (Include):**
+1. World CRUD (create, list, open, archive)
+2. Session lifecycle (start, chat, close, resume)
+3. Multi-model chat (Ollama/OpenAI/Anthropic auto-routing)
+4. Session memory (L2 — previous sessions visible and resumable)
+5. World memory (L3 — knowledge persists across sessions)
+6. Basic governance (World rules enforced, no cross-World data bleed)
+7. 1-3 Patterns (Structured Discussion, Research & Synthesis, Production Pipeline)
+8. Markdown export (all content exportable as markdown files)
+9. Theme system (already built — ship it)
+
+**MVP Feature Set (Exclude — defer to V2+):**
+- Agent Evolution Protocol
+- Threading system
+- OGK (Operator Growth Kernel)
+- Feedback loops (micro/macro)
+- Opening/Closing rituals
+- Multi-World bridging
+- Pattern customization / Agent creation UI
+- Complex governance rules / Tempo system / Dosage control
+
+**Critical Path to MVP:**
+```
+Fix IPC handlers (or adopt electron-trpc)
+    ↓
+Wire UI to real data (World CRUD, Session lifecycle)
+    ↓
+Implement Context Assembly (L1-L3 content → LLM context window)
+    ↓
+Implement basic session memory (L2 summaries across sessions)
+    ↓
+Implement 1-3 core Patterns (Structured Discussion first)
+    ↓
+Markdown export
+    ↓
+MVP SHIPS
+```
+
+**Exit Criteria:** The Hello World journey works end-to-end. A real user can create a project, have a multi-session conversation with persistent memory, and export results as markdown.
+
+---
+
 ### Phase 1: Core Engine (Memory + Governance)
 
 **Goal:** Implement the 4-layer memory model and governance enforcement.
@@ -159,6 +399,7 @@ The system is built as a **desktop harness** (Electron) that:
 - [ ] A0 enforcement module
 - [ ] Cross-layer flow validation
 - [ ] **File Watcher & Reconciliation Service** (Solve "Dual-Truth" problem between MD and DB)
+- [ ] **DualTruthService interface** — define a reconciliation pattern in `packages/core` that all persistence operations must use. Phase 1 builds the first implementation; the interface ensures all future phases handle MD↔DB reconciliation consistently rather than reinventing it. *(v2.0 — addresses OPUS Discrepancy #10)*
 
 **Exit Criteria:** Can store/retrieve all memory layers, governance blocks unauthorized writes, external file edits sync to DB.
 
@@ -181,8 +422,10 @@ The system is built as a **desktop harness** (Electron) that:
 - [ ] **Failure mode handling** — retry, abort, partial-save protocols
 - [ ] **Basic Spine Generator** (Prototype for efficient context loading)
 - [ ] **Context Assembly Heuristics** (Tuning for latency/cost)
+- [ ] **Intent Tracking Pipeline** (prototype) — decompose SIE into sub-intents, track original intent through execution, detect intent drift, verify outcomes against intent at session end. This is the runtime implementation of Intent Engineering (Section 1.5.2). *(v2.0)*
+- [ ] **Basic Context Assembly** — naive load-what's-relevant, stuff-the-prompt approach for MVP. Read L4 telos, L3 knowledge, L2 episodic history; assemble into context that fits model window. Full optimization (Spines) deferred to Phase 6. *(v2.0)*
 
-**Exit Criteria:** Can start, run, checkpoint, recover, and properly close sessions with continuity preserved.
+**Exit Criteria:** Can start, run, checkpoint, recover, and properly close sessions with continuity preserved. Intent tracking captures and monitors operator intent throughout session.
 
 ---
 
@@ -219,8 +462,9 @@ The system is built as a **desktop harness** (Electron) that:
 - [ ] A0 Agent supervision
 - [ ] **Agent Behavior Signals** — non-content performance/drift indicators for evolution
 - [ ] Per-Agent model preferences
+- [ ] **Basic Tool Primitives** — filesystem read/write (World-scoped), shell execution (with Operator approval gate), HTTP requests (governed). Agents without tools are chatbots. The full Tool Registry (Phase 11) adds whitelists, risk levels, and sandboxing; this provides day-one capabilities. *(v2.0 — addresses OPUS Discrepancy #6)*
 
-**Exit Criteria:** Agents can be defined, loaded, constrained, and their behavior tracked at runtime.
+**Exit Criteria:** Agents can be defined, loaded, constrained, their behavior tracked at runtime, and have basic tool access (fs, shell, HTTP) within governance boundaries.
 
 ---
 
@@ -240,13 +484,15 @@ The system is built as a **desktop harness** (Electron) that:
 - [x] Pattern completion conditions
 - [ ] Pattern switching protocol
 - [x] **Pattern Abort & Rollback** — clean cancellation mid-Pattern
-- [ ] Core 14 Patterns implementation (5/14 Complete)
+- [ ] **Core Patterns — MVP: ship 3** (Structured Discussion, Research & Synthesis, Production Pipeline). Remaining 11 patterns are V1.5 scope. The Pattern *system* is the MVP value, not the Pattern *count*. *(v2.0 — addresses OPUS Discrepancy #2)*
 
 **Exit Criteria:** Can run full Pattern lifecycle with Primacy Protection, Tempo control, and safe abort.
 
 ---
 
 ### Phase 6: Dispatcher, Routing & Spines
+
+> **v2.0 Phasing Note (OPUS Discrepancy #3):** Basic Context Assembly (naive load-what's-relevant, stuff-the-prompt) ships with MVP as part of Phase 2. The full Spines optimization system (80%+ cost reduction) is critical for scale but not for first users who won't have enough L3 knowledge to need it. Implement basic context assembly early; defer Spines optimization to post-MVP when real usage data reveals cost pain points. The Phase 2 "Basic Spine Generator prototype" remains as an experiment.
 
 **Goal:** Implement cost-optimized knowledge routing with Spines for 80%+ cost reduction.
 
@@ -313,7 +559,12 @@ The system is built as a **desktop harness** (Electron) that:
 - [ ] **25+ theme system** (Dracula, Nord, Catppuccin, Tokyo Night, etc.)
 - [ ] Light/dark mode variants
 - [ ] **Real-time streaming** (WebSocket → UI)
-- [ ] **Progressive disclosure** (details hidden by default, expandable)
+- [ ] **Progressive Disclosure Architecture** — design the UI with mode switching in mind *(v2.0 — addresses OPUS Discrepancy #7)*:
+  - **Conversation Mode** (default for new/non-technical users): Chat interface with projects on left, conversation in center, context visualization on right. Hides Worlds/Patterns/Agents terminology. Think: enhanced ChatGPT with persistent memory and project structure.
+  - **Studio Mode** (for power users): Full dashboard with sidebar, engine manager, agent profiles, pattern controls, governance visibility. The current developer-oriented layout.
+  - Users switch freely; underlying engine is identical.
+  - At MVP: Conversation Mode is the primary interface. Studio Mode elements are accessible but not default.
+  - The "cheesecake test": A non-technical user should be able to use LOOM without ever seeing the word "Telos" or "L4 Identity Layer."
 - [ ] **Model selector per session** (local vs cloud visible)
 - [ ] **Session class selector** (THIN/STANDARD/DEEP)
 - [ ] **Tempo indicator** in status bar
@@ -381,6 +632,8 @@ The system is built as a **desktop harness** (Electron) that:
 ---
 
 ### Phase 11: Tool Registry & Sandboxing
+
+> **v2.0 Note:** Basic tool primitives (filesystem read/write, shell execution, HTTP requests) are now delivered in Phase 4 so agents have day-one capabilities. Phase 11 adds the *governed registry* — META-managed whitelists, risk levels, sandboxing, and per-World tool scoping.
 
 **Goal:** Implement governed tool access for Agents.
 
@@ -464,6 +717,49 @@ The system is built as a **desktop harness** (Electron) that:
 - [ ] Parallel Session views (up to 12)
 
 **Exit Criteria:** Multiple Operators can collaborate within LOOM governance.
+
+---
+
+### Strategic Vision: Org-LOOM & OKR Integration (v2.0)
+
+> This section captures the long-term enterprise vision that Phase 15 enables. It is V4 scope — do not build before single-user MVP is proven. However, architectural decisions made today should ask: "Does this make Org-LOOM harder or easier?"
+
+**Platform Evolution:**
+
+| Version | Positioning | Key Capability |
+|---------|------------|----------------|
+| **V1 (MVP)** | "ChatGPT that remembers" | Single-user, basic memory, governed collaboration |
+| **V2** | "An AI team that works for you" | Multi-model routing, multiple agents, pattern library |
+| **V3** | "An ecosystem" | Agent marketplace, community patterns, inter-world bridging |
+| **V4** | "Enterprise LOOM" | Org-LOOM + OKR integration, team collaboration |
+| **V5** | "LOOM as a platform" | Protocol layer (A2A, MCP), plugin architecture |
+
+**OKR → LOOM Mapping:**
+
+| OKR Concept | LOOM Equivalent | How It Works |
+|-------------|-----------------|--------------|
+| Objective | Org Telos / World Purpose | An Objective becomes the telos of a Joint World — the immutable purpose governing all activity |
+| Key Result | Intent Contract / Pattern Output Criteria | Key Results become measurable verification conditions for Intent Envelopes and Pattern completion |
+| Initiative | Pattern Instance / Thread | Each initiative maps to a Pattern execution or Thread within a World |
+| OKR Alignment (top-down/bottom-up) | Org Telos → World Telos → Session Intent | The existing L4 hierarchy naturally cascades objectives downward |
+| OKR Review Cycle | Macro Feedback Loop / World Health Check | Designed as weekly/monthly rituals in the conceptual framework |
+| OKR Progress Tracking | L2 Episodic Memory + State Layer | Session summaries, decision logs, and continuity artifacts capture progress |
+
+**Key Org-LOOM Capabilities (V4 scope):**
+- Operator ID tracking on all writes (start early — even with single user)
+- Org Telos as a new L4 record type (schema extension)
+- Joint Worlds (multi-Operator, shared world_id with permission matrix)
+- OKR-aware Context Assembly: when starting a Session in an OKR-linked World, automatically include parent objectives, KR progress, related blockers, and cross-team context
+- Event-sourcing sync layer (fits L2's append-only design naturally)
+- 3-tier permissions: Private (default) → Shared (Joint World) → Org-wide
+
+**Design-for-it-now Decisions:**
+- Keep `packages/core` portable — runs in Electron main process today, in a server for Org-LOOM tomorrow
+- Add `operator_id` to all write operations early, even with a single user
+- Design L2 event sourcing with future sync in mind
+- Use a simple permission interface that can grow (don't build RBAC until real users demand it)
+
+**The Market Opportunity:** Every AI tool in this space is developer-first and code-focused. LOOM's mission — "for any type of person, technical or non-technical" — is completely unoccupied territory. No one is building governed, multi-agent collaboration for non-developers with OKR alignment. This is blue ocean.
 
 ---
 
@@ -634,6 +930,22 @@ The system is built as a **desktop harness** (Electron) that:
 | OP-05 | **Failure Mode Handling** | High | 2 |
 | OP-06 | **Graceful Offline Degradation** | High | 7 |
 | OP-07 | Changelog Generation | Medium | 12 |
+
+### 4.12 Engineering Discipline Features (v2.0)
+
+| ID | Feature | Priority | Phase |
+|----|---------|----------|-------|
+| ED-01 | **Context Assembly Engine** (token budgeting, relevance scoring, dynamic assembly) | Critical | 2, 6 |
+| ED-02 | **Intent Tracking Pipeline** (decompose SIE → sub-intents, track, detect drift, verify) | High | 2 |
+| ED-03 | **Intent Drift Detection** (alert when execution diverges from SIE) | High | 2 |
+| ED-04 | **Machine-Parseable Specs** (auto-generate tests/checklists from markdown specs) | Medium | 13 |
+| ED-05 | **Autonomy Level Setting** (L1-L5 dial, session-scoped, cascading) | Medium | V1.5 |
+| ED-06 | **Max Autonomy Level** (World config ceiling, Org Telos ceiling) | Medium | V1.5 |
+| ED-07 | **OrchestratorPort Interface** (abstract LangChain behind swappable port) | Medium | 7 |
+| ED-08 | **Progressive Disclosure UX** (Conversation Mode / Studio Mode) | High | 8 |
+| ED-09 | **Hello World User Journey** (end-to-end onboarding flow) | Critical | 0.5 |
+| ED-10 | **Basic Tool Primitives** (fs, shell, HTTP with Operator approval gates) | High | 4 |
+| ED-11 | **DualTruthService Interface** (MD↔DB reconciliation pattern for all persistence) | High | 1 |
 
 ---
 
@@ -1434,66 +1746,77 @@ The system is built as a **desktop harness** (Electron) that:
 
 ## 6. Dependencies & Critical Path
 
-### Dependency Graph
+### Dependency Graph (v2.0)
 
 ```
 Phase 0 (Foundation + WebSocket)
     ↓
-Phase 1 (Core Engine: Memory + Governance) ← CRITICAL
+Phase 0.5 (MVP Sprint — Hello World Journey) ← FIRST SHIPPABLE ARTIFACT
     ↓
-Phase 2 (Session Lifecycle + SIE + Checkpointing)
+Phase 1 (Core Engine: Memory + Governance + DualTruthService) ← CRITICAL
+    ↓
+Phase 2 (Session Lifecycle + SIE + Checkpointing + Intent Tracking + Basic Context Assembly)
     ↓
 ┌───────────────┬───────────────┐
 ↓               ↓               ↓
 Phase 3         Phase 4         Phase 5
 (Worlds +       (Agents +       (Patterns + Primacy
-Templates)      Behavior        + Tempo + Abort)
-                Signals)
+Templates)      Behavior        + Tempo + Abort
+                Signals +       + 3 MVP Patterns)
+                Tool Primitives)
 └───────────────┴───────────────┘
                 ↓
-    Phase 6 (Dispatcher + SPINES) ← CRITICAL FOR COST (80%+ reduction)
+    Phase 7 (LLM: LOCAL-FIRST + Model-Agnostic + OrchestratorPort) ← CRITICAL
                 ↓
-    Phase 7 (LLM: LOCAL-FIRST + Model-Agnostic) ← CRITICAL
+    Phase 8 (UI + Observability + Progressive Disclosure) ← V1 Complete
                 ↓
-    Phase 8 (UI + Observability + Keyboard + Themes) ← MVP Complete
+    Phase 6 (Dispatcher + SPINES) ← POST-MVP OPTIMIZATION (80%+ cost reduction)
                 ↓
 ┌───────────────┬───────────────┐
 ↓               ↓               ↓
 Phase 9         Phase 10        Phase 11
-(Security)      (Cost Gov)      (Tools)
+(Security)      (Cost Gov)      (Tool Registry)
 └───────────────┴───────────────┘
                 ↓
         Phase 12 (Backup/Audit)
                 ↓
-        Phase 13-15 (V2 & Beyond)
+        Phase 13-14 (V2 Features + Integration)
+                ↓
+        Phase 15 (Multi-Operator → Org-LOOM V4)
 ```
 
-### Critical Path
+### Critical Path (v2.0)
 
 1. **Phase 0** → Foundation (cannot start without)
-2. **Phase 1** → Memory model + **Reconciliation** (Foundation + "Dual-Truth" fix)
-3. **Phase 6** → Spines (80%+ cost reduction) - *Prototype moved to Phase 2*
-4. **Phase 7** → LLM integration (local-first, enables AI)
-5. **Phase 8** → UI (Streaming required to mask latency)
+2. **Phase 0.5** → First shippable artifact (Hello World journey)
+3. **Phase 1** → Memory model + DualTruthService + Governance
+4. **Phase 2** → Session lifecycle + Intent Tracking + Basic Context Assembly (MVP context handling)
+5. **Phase 7** → LLM integration (local-first, enables AI) — via OrchestratorPort
+6. **Phase 8** → UI (Streaming + Progressive Disclosure)
+7. **Phase 6** → Spines (80%+ cost reduction) — post-MVP optimization when real usage data reveals cost pain
 
-### MVP Definition
+### MVP Definition (v2.0)
 
-**MVP = Phase 0 + 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8**
+**MVP = Phase 0 + 0.5 + 1 + 2 + 3 + 4 + 5 + 7 + 8**
+
+> Phase 6 (Spines) deferred to post-MVP optimization. Basic context assembly lives in Phase 2.
 
 At MVP:
 - ✅ Create and switch Worlds (including from templates)
-- ✅ Define Agents with Telos and behavior tracking
-- ✅ Run Patterns with Primacy Protection, Tempo, and safe abort
-- ✅ Session Intent Envelope prevents drift
+- ✅ Define Agents with Telos, behavior tracking, and basic tool access
+- ✅ Run 3 core Patterns with Primacy Protection and safe abort
+- ✅ Session Intent Envelope prevents drift, with intent tracking pipeline
 - ✅ Incremental checkpointing provides crash resilience
-- ✅ Spines enable cost-efficient routing (80%+ savings)
+- ✅ Basic Context Assembly (L1-L4 → LLM context window)
 - ✅ Local models (Ollama) handle 80%+ of interactions
 - ✅ Governed LLM calls with graceful offline degradation
-- ✅ Model-agnostic (works with any provider)
-- ✅ Keyboard-first, themeable UI
+- ✅ Model-agnostic via OrchestratorPort (works with any provider)
+- ✅ Keyboard-first, themeable UI with Progressive Disclosure
 - ✅ Real-time streaming output
 - ✅ Observability dashboard
 - ✅ Memory persistence across sessions
+- ✅ Hello World user journey works end-to-end
+- ✅ Markdown export
 
 ---
 
@@ -1558,6 +1881,27 @@ Run the **LOOM Prompt Lab** experiment:
 
 ---
 
+## 8. OPUS Review — Discrepancy Resolutions (v2.0)
+
+This section documents the explicit resolution of each of the 10 discrepancies identified in [OPUS_REMARKS.md](OPUS_REMARKS.md) Part X. These represent strategic tensions between the original engineering roadmap (v1.2) and the OPUS architectural review (2026-02-24). Each has been resolved with a specific action taken in this v2.0 update.
+
+| # | Discrepancy | Dev Plan v1.2 | OPUS Assessment | Resolution in v2.0 |
+|---|-------------|---------------|-----------------|---------------------|
+| 1 | **MVP Scope** | 9 phases (0-8) before anything ships | Radically smaller — ship in weeks | **Added Phase 0.5** — Hello World journey ships first. Full Phase 0-8 remains as V1 engineering milestones. |
+| 2 | **Pattern Count** | 14 core Patterns at MVP | 1-3 Patterns at MVP | **Amended Phase 5** — ship 3 at MVP (Structured Discussion, Research & Synthesis, Production Pipeline). Remaining 11 are V1.5 scope. |
+| 3 | **Spines Priority** | Phase 6 on critical path | Post-MVP optimization | **Annotated Phase 6** — basic context assembly in Phase 2 for MVP. Spines optimization deferred to post-MVP. |
+| 4 | **IPC Architecture** | Electron contextBridge | electron-trpc | **Updated Section 2.2** — adopted electron-trpc for type-safe IPC. |
+| 5 | **LangChain Role** | Core plumbing | Abstracted behind port | **Updated Section 2.4** — LangChain wrapped behind OrchestratorPort interface. |
+| 6 | **Agent Tools** | Phase 11 (post-MVP) | Day-one capability | **Amended Phase 4** — basic tool primitives (fs, shell, HTTP) in Phase 4. Full registry stays Phase 11. |
+| 7 | **UX Modes** | Single "progressive disclosure" bullet | Architectural concern | **Expanded Phase 8** — Progressive Disclosure Architecture with Conversation Mode / Studio Mode. |
+| 8 | **Industry Framing** | Not mentioned | Strategic positioning needed | **Added Section 1.5** — Engineering Disciplines Framework (Context, Intent, Specification Engineering). |
+| 9 | **User Journey** | Feature-oriented phases | Hello World experience needed | **Added Phase 0.5** — complete Hello World user journey defined with exit criteria. |
+| 10 | **Dual Truth** | Phase 1 one-time fix | Ongoing architectural pattern | **Amended Phase 1** — added DualTruthService interface that all persistence operations must use. |
+
+> **Reference:** Full analysis in [OPUS_REMARKS.md](OPUS_REMARKS.md) Part X: "Discrepancies — OPUS_REMARKS vs. LOOM_DEVELOPMENT_PLAN.md"
+
+---
+
 ## Appendix A: Key File Locations (Canonical References)
 
 | Document | Purpose |
@@ -1574,6 +1918,7 @@ Run the **LOOM Prompt Lab** experiment:
 | `V2 Library/LOOM_V2_Master_Synthesis.md` | V2 feature synthesis |
 | `knowledge/V2.0.0/notes.md` | **V2 Ideas & Scratchpad** (Anti-feature-creep buffer) |
 | `Systems/README.md` | Spines, Dispatcher, cost optimization |
+| `OPUS_REMARKS.md` | **Strategic review & recommendations** (v2.0 source — Context/Intent/Spec Engineering, DeepMind Autonomy Levels, Org-LOOM vision) |
 
 ---
 
@@ -1625,6 +1970,7 @@ Run the **LOOM Prompt Lab** experiment:
 | 1.0 | 2026-01-14 | Initial plan |
 | 1.1 | 2026-01-14 | Added high-impact items: Spines, Tempo, Primacy, SIE, Checkpointing, Behavior Signals, Templates, Abort protocol, Observability |
 | 1.2 | 2026-01-14 | Added UI/UX from Automaker & Auto-Claude: Keyboard navigation, themes, streaming, Kanban view, progressive disclosure, dependency graphs, terminal integration, model selector |
+| 2.0 | 2026-03-01 | Integrated OPUS_REMARKS strategic review: added Engineering Disciplines framework (Context, Intent, Specification), Phase 0.5 MVP Sprint, DeepMind Autonomy Levels, Hello World user journey, Org-LOOM strategic vision, resolved 10 OPUS discrepancies, updated tech stack recommendations |
 
 ---
 
