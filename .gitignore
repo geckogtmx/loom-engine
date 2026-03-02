@@ -44,6 +44,9 @@ release/
 tmp/
 logs/
 
+# --- Claude Code (Local Settings) ---
+.claude/settings.local.json
+
 # --- Obsidian Vault (Knowledge) ---
 # Ignore workspace state (cursor pos, open tabs) which changes constantly
 knowledge/.obsidian/workspace.json

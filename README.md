@@ -8,7 +8,9 @@ A local-first desktop app for structured AI collaboration with persistent memory
 
 ## What is LOOM?
 
-LOOM Engine is a desktop application that lets you work with AI models in structured, persistent sessions. Unlike typical chatbots that forget everything between conversations, LOOM remembers what you discussed, keeps your projects separate, and runs AI models locally on your machine by default — with optional cloud API access when you need more power.
+LOOM Engine is a cognitive architecture implemented as a desktop application. It enables structured AI collaboration across long time horizons without losing context or control.
+
+Unlike typical chatbots that forget everything between conversations, LOOM remembers what you discussed, keeps your projects separate, and runs AI models locally on your machine by default — with optional cloud API access when you need more power.
 
 Built with Electron and React. Runs on Windows, macOS, and Linux.
 
